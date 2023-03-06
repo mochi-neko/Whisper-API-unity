@@ -15,7 +15,7 @@ namespace Mochineko.Whisper_API.Formats
         /// The audio file to transcribe, in one of these formats: mp3, mp4, mpeg, mpga, m4a, wav, or webm.
         /// </summary>
         [JsonProperty("file"), JsonRequired]
-        public string File { get; }
+        public string File { get; set; }
         
         /// <summary>
         /// [Required]
