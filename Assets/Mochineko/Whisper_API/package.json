@@ -1,0 +1,11 @@
+{
+  "name": "com.mochineko.whisper-api",
+  "version": "0.1.0",
+  "displayName": "OpenAI Whisper API for Unity",
+  "description": "OpenAI Whisper API bindings to pure C# on Unity.",
+  "unity": "2021.3",
+  "author": {
+    "name": "Mochineko",
+    "email": "t.o.e.4315@gmail.com"
+  }
+}
