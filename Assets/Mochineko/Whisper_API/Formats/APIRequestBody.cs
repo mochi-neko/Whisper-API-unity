@@ -1,4 +1,5 @@
 #nullable enable
+using System.IO;
 using Newtonsoft.Json;
 
 namespace Mochineko.Whisper_API.Formats
@@ -16,7 +17,7 @@ namespace Mochineko.Whisper_API.Formats
         /// </summary>
         [JsonProperty("file"), JsonRequired]
         public string File { get; set; }
-        
+
         /// <summary>
         /// [Required]
         /// ID of the model to use.
@@ -39,7 +40,7 @@ namespace Mochineko.Whisper_API.Formats
         /// </summary>
         [JsonProperty("response_format")]
         public string? ResponseFormat { get; }
-        
+
         /// <summary>
         /// [Optional] Defaults to 1.
         /// The sampling temperature, between 0 and 1.
@@ -53,6 +54,7 @@ namespace Mochineko.Whisper_API.Formats
         /// [Optional]
         /// The language of the input audio.
         /// Supplying the input language in ISO-639-1 format will improve accuracy and latency.
+        /// See https://github.com/openai/whisper#available-models-and-languages
         /// </summary>
         [JsonProperty("language")]
         public string? Language { get; }
@@ -77,6 +79,31 @@ namespace Mochineko.Whisper_API.Formats
             this.ResponseFormat = responseFormat;
             this.Temperature = temperature;
             this.Language = language;
+        }
+
+        internal static readonly string[] AvailableAudioFileFormats =
+        {
+            ".mp3",
+            ".mp4",
+            ".mpeg",
+            ".mpga",
+            ".m4a",
+            ".wav",
+            ".webm",
+        };
+
+        internal static bool IsAvailableFormat(string file)
+        {
+            var extension = Path.GetExtension(file);
+            foreach (var available in AvailableAudioFileFormats)
+            {
+                if (extension == available)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         public string ToJson()

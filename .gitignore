@@ -77,3 +77,7 @@ crashlytics-build.properties
 # OpenAI API Key
 /[Aa]ssets/Mochineko/Whisper_API.Tests/OpenAI_API_Key.txt
 /[Aa]ssets/Mochineko/Whisper_API.Tests/OpenAI_API_Key.txt.meta
+
+# Test audio file
+/[Aa]ssets/Mochineko/Whisper_API.Tests/test.wav
+/[Aa]ssets/Mochineko/Whisper_API.Tests/test.wav.meta
