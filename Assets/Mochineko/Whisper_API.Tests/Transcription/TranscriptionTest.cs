@@ -28,7 +28,7 @@ namespace Mochineko.Whisper_API.Tests.Transcription
                 Application.dataPath,
                 "Mochineko/Whisper_API.Tests/test.wav");
 
-            var connection = new WhisperConnection(apiKey, Model.Whisper1);
+            var connection = new WhisperTranscriptionConnection(apiKey, Model.Whisper1);
 
             var result = await connection.TranscribeAsync(filePath, CancellationToken.None);
 
@@ -61,7 +61,7 @@ namespace Mochineko.Whisper_API.Tests.Transcription
                 language: "jp"
             );
 
-            var connection = new WhisperConnection(apiKey, requestBody);
+            var connection = new WhisperTranscriptionConnection(apiKey, requestBody);
 
             var result = await connection.TranscribeAsync(filePath, CancellationToken.None);
 
