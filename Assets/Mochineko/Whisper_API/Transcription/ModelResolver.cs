@@ -1,7 +1,7 @@
 #nullable enable
 using System.Collections.Generic;
 
-namespace Mochineko.Whisper_API.Formats
+namespace Mochineko.Whisper_API.Transcription
 {
     internal static class ModelResolver
     {

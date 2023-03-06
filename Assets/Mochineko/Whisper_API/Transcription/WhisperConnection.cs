@@ -8,7 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
-namespace Mochineko.Whisper_API.Formats
+namespace Mochineko.Whisper_API.Transcription
 {
     /// <summary>
     /// Binds Whisper speech to text API.

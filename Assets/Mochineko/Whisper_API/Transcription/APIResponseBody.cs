@@ -1,7 +1,7 @@
 #nullable enable
 using Newtonsoft.Json;
 
-namespace Mochineko.Whisper_API.Formats
+namespace Mochineko.Whisper_API.Transcription
 {
     [JsonObject]
     public sealed class APIResponseBody

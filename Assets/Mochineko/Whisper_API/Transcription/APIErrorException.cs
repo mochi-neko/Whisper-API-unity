@@ -2,7 +2,7 @@
 using System;
 using System.Net;
 
-namespace Mochineko.Whisper_API.Formats
+namespace Mochineko.Whisper_API.Transcription
 {
     /// <summary>
     /// See https://platform.openai.com/docs/guides/error-codes/api-errors

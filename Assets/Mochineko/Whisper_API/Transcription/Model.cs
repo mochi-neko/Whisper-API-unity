@@ -1,5 +1,5 @@
 #nullable enable
-namespace Mochineko.Whisper_API.Formats
+namespace Mochineko.Whisper_API.Transcription
 {
     /// <summary>
     /// Speech recognition model.

@@ -2,7 +2,7 @@
 using System.IO;
 using Newtonsoft.Json;
 
-namespace Mochineko.Whisper_API.Formats
+namespace Mochineko.Whisper_API.Transcription
 {
     /// <summary>
     /// Request body of Whisper speech to text API.
@@ -59,7 +59,7 @@ namespace Mochineko.Whisper_API.Formats
         [JsonProperty("language")]
         public string? Language { get; }
 
-        public APIRequestBody(string file, Model model = Formats.Model.Whisper1)
+        public APIRequestBody(string file, Model model = Transcription.Model.Whisper1)
         {
             this.File = file;
             this.Model = model.ToText();
