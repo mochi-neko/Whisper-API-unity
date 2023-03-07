@@ -10,7 +10,7 @@ namespace Mochineko.Whisper_API.Transcription
     public sealed class APIErrorException : Exception
     {
         internal APIErrorException(HttpStatusCode statusCode, APIErrorResponseBody errorResponse)
-            : base($"status code:{statusCode}, " +
+            : base($"status code:[{(int)statusCode}]{statusCode}, " +
                    $"message:{errorResponse.Error.Message}, " +
                    $"type:{errorResponse.Error.Type}, " +
                    $"param:{errorResponse.Error.Param}, " +

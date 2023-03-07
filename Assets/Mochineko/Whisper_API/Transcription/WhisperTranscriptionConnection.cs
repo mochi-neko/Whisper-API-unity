@@ -64,23 +64,7 @@ namespace Mochineko.Whisper_API.Transcription
             this.requestBody = requestBody;
         }
 
-        /// <summary>
-        /// Transcribes audio by Whisper speech to text API.
-        /// https://platform.openai.com/docs/api-reference/audio/create
-        /// </summary>
-        /// <param name="filePath">File path of speech audio</param>
-        /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>Response text from Whisper speech to text API.</returns>
-        /// <exception cref="Exception">System exceptions</exception>
-        /// <exception cref="APIErrorException">API error response</exception>
-        /// <exception cref="HttpRequestException">Network error</exception>
-        /// <exception cref="TaskCanceledException">Cancellation or timeout</exception>
-        /// <exception cref="JsonSerializationException">JSON error</exception>
-        /// <exception cref="ArgumentNullException">File path is null or empty</exception>
-        /// <exception cref="FileNotFoundException">Audio file not found</exception>
-        /// <exception cref="InvalidDataException">Not available audio format</exception>
-        /// <exception cref="OperationCanceledException">Cancelled on called</exception>
-        public async Task<string> TranscribeAsync(string filePath, CancellationToken cancellationToken)
+        public async Task<string> TranscribeFromFileAsync(string filePath, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -99,12 +83,59 @@ namespace Mochineko.Whisper_API.Transcription
                 throw new InvalidDataException(filePath);
             }
 
-            requestBody.File = Path.GetFileName(filePath);
+            using var stream = File.OpenRead(filePath);
+
+            return await TranscribeAsync(
+                fileStream: stream,
+                fileName: Path.GetFileName(filePath),
+                cancellationToken);
+        }
+
+        /// <summary>
+        /// Transcribes audio by Whisper speech to text API.
+        /// https://platform.openai.com/docs/api-reference/audio/create
+        /// </summary>
+        /// <param name="fileStream">File data stream of speech audio</param>
+        /// <param name="fileName">File name of speech audio</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Response text from Whisper speech to text API.</returns>
+        /// <exception cref="Exception">System exceptions</exception>
+        /// <exception cref="APIErrorException">API error response</exception>
+        /// <exception cref="HttpRequestException">Network error</exception>
+        /// <exception cref="TaskCanceledException">Cancellation or timeout</exception>
+        /// <exception cref="JsonSerializationException">JSON error</exception>
+        /// <exception cref="ArgumentNullException">File path is null or empty</exception>
+        /// <exception cref="FileNotFoundException">Audio file not found</exception>
+        /// <exception cref="InvalidDataException">Not available audio format</exception>
+        /// <exception cref="OperationCanceledException">Cancelled on called</exception>
+        public async Task<string> TranscribeAsync(
+            Stream fileStream,
+            string fileName,
+            CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            if (fileStream == null)
+            {
+                throw new ArgumentNullException(nameof(fileStream));
+            }
+
+            if (string.IsNullOrEmpty(fileName))
+            {
+                throw new ArgumentNullException(nameof(fileName));
+            }
+
+            if (!APIRequestBody.IsAvailableFormat(fileName))
+            {
+                throw new InvalidDataException(fileName);
+            }
+
+            requestBody.File = fileName;
 
             using var requestMessage = CreateRequestMessage(
                 headers,
                 requestBody,
-                File.OpenRead(filePath));
+                fileStream);
 
             // Post request and receive response
             using var responseMessage = await httpClient.SendAsync(requestMessage, cancellationToken);
@@ -124,7 +155,7 @@ namespace Mochineko.Whisper_API.Transcription
                 // Text format is determined by request parameter:"response_format".
                 return responseText;
             }
-            else if (IsAPIError(responseMessage.StatusCode))
+            else
             {
                 var errorResponseBody = APIErrorResponseBody.FromJson(responseText);
                 if (errorResponseBody != null)
@@ -134,17 +165,12 @@ namespace Mochineko.Whisper_API.Transcription
                 }
                 else
                 {
-                    throw new Exception(
-                        $"[Whisper_API] Error response body is null with status code:{responseMessage.StatusCode}.");
-                }
-            }
-            else // Another error, e.g. 5XX errors.
-            {
-                // Throws HttpRequestException
-                responseMessage.EnsureSuccessStatusCode();
+                    // Error without error response
+                    responseMessage.EnsureSuccessStatusCode();
 
-                throw new Exception(
-                    $"[Whisper_API] It should not be be reached with status code:{responseMessage.StatusCode}.");
+                    throw new Exception(
+                        $"[Whisper_API] It should not be be reached with status code:{responseMessage.StatusCode}.");
+                }
             }
         }
 
@@ -173,20 +199,14 @@ namespace Mochineko.Whisper_API.Transcription
                     encoding: System.Text.Encoding.UTF8),
                 name: "model");
 
-            // requestContent.Add(
-            //     content: new StreamContent(content: fileStream),
-            //     name: "file",
-            //     fileName: requestBody.File);
-            
             requestContent.Add(
-                content: new StreamContent(content: fileStream));
+                content: new StreamContent(content: fileStream),
+                name: "file",
+                fileName: requestBody.File);
 
             requestMessage.Content = requestContent;
 
             return requestMessage;
         }
-
-        private static bool IsAPIError(HttpStatusCode statusCode)
-            => 400 <= (int)statusCode && (int)statusCode <= 499;
     }
 }

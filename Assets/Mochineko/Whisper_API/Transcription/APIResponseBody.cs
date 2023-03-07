@@ -6,9 +6,8 @@ namespace Mochineko.Whisper_API.Transcription
     [JsonObject]
     public sealed class APIResponseBody
     {
-        [JsonProperty("text"), JsonRequired]
-        public string Text { get; private set; }
-        
+        [JsonProperty("text"), JsonRequired] public string Text { get; private set; } = string.Empty;
+
         public string ToJson()
             => JsonConvert.SerializeObject(this, Formatting.Indented);
 
