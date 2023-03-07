@@ -32,9 +32,11 @@ namespace Mochineko.Whisper_API.Tests.Transcription
 
             var result = await connection.TranscribeAsync(filePath, CancellationToken.None);
 
-            string.IsNullOrEmpty(result.Text).Should().BeFalse();
+            string.IsNullOrEmpty(result).Should().BeFalse();
 
-            Debug.Log($"Result:\n{result.Text}");
+            var json = APIResponseBody.FromJson(result);
+
+            Debug.Log($"Result:\n{json.Text}");
         }
 
         [Test]
@@ -65,9 +67,9 @@ namespace Mochineko.Whisper_API.Tests.Transcription
 
             var result = await connection.TranscribeAsync(filePath, CancellationToken.None);
 
-            string.IsNullOrEmpty(result.Text).Should().BeFalse();
+            var json = APIResponseBody.FromJson(result);
 
-            Debug.Log($"Result:\n{result.Text}");
+            Debug.Log($"Result:\n{json.Text}");
         }
     }
 }

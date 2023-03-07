@@ -16,7 +16,7 @@ namespace Mochineko.Whisper_API.Transcription
     public sealed class WhisperTranscriptionConnection
     {
         private const string EndPoint = "https://api.openai.com/v1/audio/transcriptions";
-        
+
         private readonly IReadOnlyDictionary<string, string> headers;
         private readonly APIRequestBody requestBody;
 
@@ -68,7 +68,7 @@ namespace Mochineko.Whisper_API.Transcription
         /// Transcribes audio by Whisper speech to text API.
         /// https://platform.openai.com/docs/api-reference/audio/create
         /// </summary>
-        /// <param name="file">File path of speech audio</param>
+        /// <param name="filePath">File path of speech audio</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Response text from Whisper speech to text API.</returns>
         /// <exception cref="Exception">System exceptions</exception>
@@ -80,28 +80,31 @@ namespace Mochineko.Whisper_API.Transcription
         /// <exception cref="FileNotFoundException">Audio file not found</exception>
         /// <exception cref="InvalidDataException">Not available audio format</exception>
         /// <exception cref="OperationCanceledException">Cancelled on called</exception>
-        public async Task<APIResponseBody> TranscribeAsync(string file, CancellationToken cancellationToken)
+        public async Task<string> TranscribeAsync(string filePath, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            if (string.IsNullOrEmpty(file))
+            if (string.IsNullOrEmpty(filePath))
             {
-                throw new ArgumentNullException(nameof(file));
+                throw new ArgumentNullException(nameof(filePath));
             }
 
-            if (!File.Exists(file))
+            if (!File.Exists(filePath))
             {
-                throw new FileNotFoundException(file);
+                throw new FileNotFoundException(filePath);
             }
 
-            if (!APIRequestBody.IsAvailableFormat(file))
+            if (!APIRequestBody.IsAvailableFormat(filePath))
             {
-                throw new InvalidDataException(file);
+                throw new InvalidDataException(filePath);
             }
 
-            requestBody.File = file;
+            requestBody.File = Path.GetFileName(filePath);
 
-            using var requestMessage = CreateRequestMessage(headers, requestBody);
+            using var requestMessage = CreateRequestMessage(
+                headers,
+                requestBody,
+                File.OpenRead(filePath));
 
             // Post request and receive response
             using var responseMessage = await httpClient.SendAsync(requestMessage, cancellationToken);
@@ -110,25 +113,20 @@ namespace Mochineko.Whisper_API.Transcription
                 throw new Exception($"[Whisper_API] HttpResponseMessage is null.");
             }
 
-            var responseJson = await responseMessage.Content.ReadAsStringAsync();
-            if (string.IsNullOrEmpty(responseJson))
+            var responseText = await responseMessage.Content.ReadAsStringAsync();
+            if (string.IsNullOrEmpty(responseText))
             {
                 throw new Exception($"[Whisper_API] Response JSON is null or empty.");
             }
-            
+
             if (responseMessage.IsSuccessStatusCode)
             {
-                var responseBody = APIResponseBody.FromJson(responseJson);
-                if (responseBody == null)
-                {
-                    throw new Exception($"[Whisper_API] Response body is null.");
-                }
-
-                return responseBody;
+                // Text format is determined by request parameter:"response_format".
+                return responseText;
             }
             else if (IsAPIError(responseMessage.StatusCode))
             {
-                var errorResponseBody = APIErrorResponseBody.FromJson(responseJson);
+                var errorResponseBody = APIErrorResponseBody.FromJson(responseText);
                 if (errorResponseBody != null)
                 {
                     // Handle API error response
@@ -136,7 +134,8 @@ namespace Mochineko.Whisper_API.Transcription
                 }
                 else
                 {
-                    throw new Exception($"[Whisper_API] Error response body is null with status code:{responseMessage.StatusCode}.");
+                    throw new Exception(
+                        $"[Whisper_API] Error response body is null with status code:{responseMessage.StatusCode}.");
                 }
             }
             else // Another error, e.g. 5XX errors.
@@ -144,7 +143,8 @@ namespace Mochineko.Whisper_API.Transcription
                 // Throws HttpRequestException
                 responseMessage.EnsureSuccessStatusCode();
 
-                throw new Exception($"[Whisper_API] It should not be be reached with status code:{responseMessage.StatusCode}.");
+                throw new Exception(
+                    $"[Whisper_API] It should not be be reached with status code:{responseMessage.StatusCode}.");
             }
         }
 
@@ -156,7 +156,8 @@ namespace Mochineko.Whisper_API.Transcription
 
         private static HttpRequestMessage CreateRequestMessage(
             IReadOnlyDictionary<string, string> headers,
-            APIRequestBody requestBody)
+            APIRequestBody requestBody,
+            Stream fileStream)
         {
             var requestMessage = new HttpRequestMessage(HttpMethod.Post, EndPoint);
             foreach (var header in headers)
@@ -164,10 +165,21 @@ namespace Mochineko.Whisper_API.Transcription
                 requestMessage.Headers.Add(header.Key, header.Value);
             }
 
-            var requestContent = new StringContent(
-                content: requestBody.ToJson(),
-                encoding: System.Text.Encoding.UTF8,
-                mediaType: "multipart/form-data");
+            var requestContent = new MultipartFormDataContent();
+
+            requestContent.Add(
+                content: new StringContent(
+                    content: $"{requestBody.Model}",
+                    encoding: System.Text.Encoding.UTF8),
+                name: "model");
+
+            // requestContent.Add(
+            //     content: new StreamContent(content: fileStream),
+            //     name: "file",
+            //     fileName: requestBody.File);
+            
+            requestContent.Add(
+                content: new StreamContent(content: fileStream));
 
             requestMessage.Content = requestContent;
 
