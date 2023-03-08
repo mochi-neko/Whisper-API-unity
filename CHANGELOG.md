@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add translation API.
 
-## [0.1.0] - 2023-03-04
+## [0.1.0] - 2023-03-08
 
 ### Added
 
