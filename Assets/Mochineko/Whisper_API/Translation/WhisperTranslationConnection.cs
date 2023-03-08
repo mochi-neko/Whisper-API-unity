@@ -93,11 +93,11 @@ namespace Mochineko.Whisper_API.Translation
         }
 
         /// <summary>
-        /// Translates audio into English text by Whisper translation API.
+        /// Translates speech audio into English text by Whisper translation API.
         /// </summary>
         /// <param name="filePath">File path of speech audio file</param>
         /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns></returns>
+        /// <returns>Response text (default format is JSON)</returns>
         /// <exception cref="Exception">System exceptions</exception>
         /// <exception cref="APIErrorException">API error response</exception>
         /// <exception cref="HttpRequestException">Network error</exception>
@@ -126,7 +126,7 @@ namespace Mochineko.Whisper_API.Translation
                 throw new InvalidDataException(filePath);
             }
 
-            using var stream = File.OpenRead(filePath);
+            await using var stream = File.OpenRead(filePath);
 
             return await TranslateAsync(
                 fileStream: stream,
@@ -135,12 +135,12 @@ namespace Mochineko.Whisper_API.Translation
         }
 
         /// <summary>
-        /// Translates audio into English text by Whisper translation API.
+        /// Translates speech audio into English text by Whisper translation API.
         /// </summary>
         /// <param name="fileStream">File data stream of speech audio</param>
         /// <param name="fileName">File name of speech audio</param>
         /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>Response text</returns>
+        /// <returns>Response text (default format is JSON)</returns>
         /// <exception cref="Exception">System exceptions</exception>
         /// <exception cref="APIErrorException">API error response</exception>
         /// <exception cref="HttpRequestException">Network error</exception>
