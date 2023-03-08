@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Mochineko.Whisper_API.Transcription
+namespace Mochineko.Whisper_API
 {
     internal static class InverseDictionaryExtension
     {

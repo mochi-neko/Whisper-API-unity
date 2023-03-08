@@ -7,7 +7,7 @@ using UnityEngine.Assertions;
 namespace Mochineko.Whisper_API.Transcription.Samples
 {
     /// <summary>
-    /// A sample component to transcribe speech by Whisper API on Unity.
+    /// A sample component to transcribe speech into text by Whisper transcription API on Unity.
     /// </summary>
     public sealed class TranscriptionSample : MonoBehaviour
     {
@@ -60,7 +60,7 @@ namespace Mochineko.Whisper_API.Transcription.Samples
             string result;
             try
             {
-                // Transcribe speech by Whisper speech to text API.
+                // Transcribe speech into text by Whisper transcription API.
                 result = await connection
                     .TranscribeFromFileAsync(filePath, this.GetCancellationTokenOnDestroy());
             }

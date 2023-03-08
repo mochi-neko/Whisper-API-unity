@@ -7,8 +7,9 @@ using Mochineko.Whisper_API.Transcription;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
+using APIResponseBody = Mochineko.Whisper_API.Transcription.APIResponseBody;
 
-namespace Mochineko.Whisper_API.Tests.Transcription
+namespace Mochineko.Whisper_API.Transcription.Tests
 {
     [TestFixture]
     internal sealed class TranscriptionTest
