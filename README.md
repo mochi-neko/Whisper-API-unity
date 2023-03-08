@@ -1,5 +1,5 @@
 # Whisper-API-unity
-Binds [Whisper speech to text API](https://platform.openai.com/docs/api-reference/audio) to pure C# on Unity.
+Binds [Whisper transcription and translation API](https://platform.openai.com/docs/api-reference/audio) to pure C# on Unity.
 
 See also [official document](https://platform.openai.com/docs/guides/speech-to-text).
 
@@ -21,7 +21,7 @@ to your `mainfest.json`.
 
 If you have already used Newtonsoft.Json on your project, remove dependency:`"com.unity.nuget.newtonsoft-json": "3.0.2",`.
 
-## How to use speech to text by Whisper API
+## How to use transcription speech audio into text by Whisper API
 
 1. Generate API key on [OpenAI](https://platform.openai.com/account/api-keys). (Take care your API key, this is a secret information then you should not open.)
 2. Create an instance of `WhisperTranscriptionConnection` with API key.
@@ -102,6 +102,7 @@ namespace XXX
 
 See also [Sample](https://github.com/mochi-neko/Whisper-API-unity/blob/main/Assets/Mochineko/Whisper_API.Samples/Transcription/TranscriptionSample.cs).
 
+Translation (translate speech audio into English text) sample is [here](https://github.com/mochi-neko/Whisper-API-unity/blob/main/Assets/Mochineko/Whisper_API.Samples/Transcription/TranscriptionSample.cs).
 
 ## Changelog
 
