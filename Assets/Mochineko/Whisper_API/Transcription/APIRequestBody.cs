@@ -70,7 +70,7 @@ namespace Mochineko.Whisper_API.Transcription
             string model,
             string? prompt = null,
             string? responseFormat = "json",
-            float? temperature = null,
+            float? temperature = 1f,
             string? language = null)
         {
             this.File = file;
