@@ -7,13 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added 
-
-- Add translation API.
-
 ## [0.1.0] - 2023-03-08
 
 ### Added
 
 - Implement Whisper transctiption API bindings to C#.
 - Implement sample component of transctiption.
+- Implement Whisper translation API bindings to C#.
+- Implement sample component of translation.

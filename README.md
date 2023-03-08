@@ -3,10 +3,6 @@ Binds [Whisper speech to text API](https://platform.openai.com/docs/api-referenc
 
 See also [official document](https://platform.openai.com/docs/guides/speech-to-text).
 
-Now only transcription API is suppoted.
-
-Translation API will be supported in a few days by author.
-
 ## How to import by UnityPackageManager
 
 Add dependencies:
@@ -40,6 +36,7 @@ using System;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Assertions;
+using Mochineko.Whisper_API.;
 using Mochineko.Whisper_API.Transcription;
 
 namespace XXX
