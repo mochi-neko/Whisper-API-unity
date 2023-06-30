@@ -27,9 +27,15 @@ namespace Mochineko.Whisper_API.Tests
                 Application.dataPath,
                 "Mochineko/Whisper_API.Tests/test.wav");
 
-            var connection = new Transcription(apiKey, Model.Whisper1);
+            using var httpClient = new System.Net.Http.HttpClient();
 
-            var result = await connection.TranscribeFromFileAsync(filePath, CancellationToken.None);
+            var result = await Transcription
+                .TranscribeFromFileAsync(
+                    apiKey,
+                    httpClient,
+                    filePath,
+                    Model.Whisper1,
+                    CancellationToken.None);
 
             string.IsNullOrEmpty(result).Should().BeFalse();
 

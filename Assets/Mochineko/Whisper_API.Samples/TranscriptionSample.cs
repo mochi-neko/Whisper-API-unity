@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Net.Http;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -21,16 +22,13 @@ namespace Mochineko.Whisper_API.Samples
         /// </summary>
         [SerializeField] private string filePath = string.Empty;
 
-        private Transcription? connection;
-
+        private static readonly HttpClient httpClient = new();
+        
         private void Start()
         {
             // API Key must be set.
             Assert.IsNotNull(apiKey);
 
-            // Create instance of WhisperTranscriptionConnection.
-            connection = new Transcription(apiKey);
-            
             // If you want to specify response format, language, etc..., please use other initialization:
             // connection = new WhisperTranscriptionConnection(apiKey, new APIRequestBody(
             //     file: "",
@@ -45,12 +43,6 @@ namespace Mochineko.Whisper_API.Samples
         public async void Transcribe()
         {
             // Validations
-            if (connection == null)
-            {
-                Debug.LogError($"[Whisper_API.Transcription.Samples] Connection is null.");
-                return;
-            }
-
             if (string.IsNullOrEmpty(filePath))
             {
                 Debug.LogError($"[Whisper_API.Transcription.Samples] File path is null or empty.");
@@ -61,8 +53,13 @@ namespace Mochineko.Whisper_API.Samples
             try
             {
                 // Transcribe speech into text by Whisper transcription API.
-                result = await connection
-                    .TranscribeFromFileAsync(filePath, this.GetCancellationTokenOnDestroy());
+                result = await Transcription
+                    .TranscribeFromFileAsync(
+                        apiKey,
+                        httpClient,
+                        filePath, 
+                        Model.Whisper1,
+                        this.GetCancellationTokenOnDestroy());
             }
             catch (Exception e)
             {

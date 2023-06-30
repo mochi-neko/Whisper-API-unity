@@ -59,22 +59,16 @@ namespace Mochineko.Whisper_API
         [JsonProperty("language")]
         public string? Language { get; }
 
-        public TranscriptionRequestBody(string file, Model model = Whisper_API.Model.Whisper1)
-        {
-            this.File = file;
-            this.Model = model.ToText();
-        }
-
         public TranscriptionRequestBody(
             string file,
-            string model,
+            Model model,
             string? prompt = null,
             string? responseFormat = null,
             float? temperature = null,
             string? language = null)
         {
             this.File = file;
-            this.Model = model;
+            this.Model = model.ToText();
             this.Prompt = prompt;
             this.ResponseFormat = responseFormat;
             this.Temperature = temperature;
