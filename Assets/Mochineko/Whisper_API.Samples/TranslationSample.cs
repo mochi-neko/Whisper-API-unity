@@ -4,7 +4,7 @@ using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-namespace Mochineko.Whisper_API.Translation.Samples
+namespace Mochineko.Whisper_API.Samples
 {
     /// <summary>
     /// A sample component to translate speech into English text by Whisper transcription API on Unity.
@@ -21,7 +21,7 @@ namespace Mochineko.Whisper_API.Translation.Samples
         /// </summary>
         [SerializeField] private string filePath = string.Empty;
 
-        private WhisperTranslationConnection? connection;
+        private Translation? connection;
 
         private void Start()
         {
@@ -29,7 +29,7 @@ namespace Mochineko.Whisper_API.Translation.Samples
             Assert.IsNotNull(apiKey);
 
             // Create instance of WhisperTranscriptionConnection.
-            connection = new WhisperTranslationConnection(apiKey);
+            connection = new Translation(apiKey);
             
             // If you want to specify response format, etc..., please use other initialization:
             // connection = new WhisperTranslationConnection(apiKey, new APIRequestBody(
@@ -71,7 +71,7 @@ namespace Mochineko.Whisper_API.Translation.Samples
             }
 
             // Default text response format is JSON.
-            var text = APIResponseBody.FromJson(result)?.Text;
+            var text = TranslationResponseBody.FromJson(result)?.Text;
 
             // Log text result.
             Debug.Log($"[Whisper_API.Translation.Samples] Result:\n{text}");

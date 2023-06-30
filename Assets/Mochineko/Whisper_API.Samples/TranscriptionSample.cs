@@ -4,7 +4,7 @@ using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-namespace Mochineko.Whisper_API.Transcription.Samples
+namespace Mochineko.Whisper_API.Samples
 {
     /// <summary>
     /// A sample component to transcribe speech into text by Whisper transcription API on Unity.
@@ -21,7 +21,7 @@ namespace Mochineko.Whisper_API.Transcription.Samples
         /// </summary>
         [SerializeField] private string filePath = string.Empty;
 
-        private WhisperTranscriptionConnection? connection;
+        private Transcription? connection;
 
         private void Start()
         {
@@ -29,7 +29,7 @@ namespace Mochineko.Whisper_API.Transcription.Samples
             Assert.IsNotNull(apiKey);
 
             // Create instance of WhisperTranscriptionConnection.
-            connection = new WhisperTranscriptionConnection(apiKey);
+            connection = new Transcription(apiKey);
             
             // If you want to specify response format, language, etc..., please use other initialization:
             // connection = new WhisperTranscriptionConnection(apiKey, new APIRequestBody(
@@ -72,7 +72,7 @@ namespace Mochineko.Whisper_API.Transcription.Samples
             }
 
             // Default text response format is JSON.
-            var text = APIResponseBody.FromJson(result)?.Text;
+            var text = TranscriptionResponseBody.FromJson(result)?.Text;
 
             // Log text result.
             Debug.Log($"[Whisper_API.Transcription.Samples] Result:\n{text}");

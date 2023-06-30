@@ -7,14 +7,14 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 
-namespace Mochineko.Whisper_API.Translation.Tests
+namespace Mochineko.Whisper_API.Tests
 {
     [TestFixture]
-    internal sealed class TranslationTest
+    internal sealed class TranscriptionTest
     {
         [Test]
         [RequiresPlayMode(false)]
-        public async Task Translate()
+        public async Task Transcribe()
         {
             // This file is a target of .gitignore.
             var apiKeyPath = Path.Combine(
@@ -27,13 +27,13 @@ namespace Mochineko.Whisper_API.Translation.Tests
                 Application.dataPath,
                 "Mochineko/Whisper_API.Tests/test.wav");
 
-            var connection = new WhisperTranslationConnection(apiKey, Model.Whisper1);
+            var connection = new Transcription(apiKey, Model.Whisper1);
 
-            var result = await connection.TranslateFromFileAsync(filePath, CancellationToken.None);
+            var result = await connection.TranscribeFromFileAsync(filePath, CancellationToken.None);
 
             string.IsNullOrEmpty(result).Should().BeFalse();
 
-            var json = APIResponseBody.FromJson(result);
+            var json = TranscriptionResponseBody.FromJson(result);
 
             Debug.Log($"Result:\n{json?.Text}");
         }

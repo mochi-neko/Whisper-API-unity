@@ -2,14 +2,14 @@
 using System.IO;
 using Newtonsoft.Json;
 
-namespace Mochineko.Whisper_API.Translation
+namespace Mochineko.Whisper_API
 {
     /// <summary>
     /// Request body of Whisper transcription API.
     /// See https://platform.openai.com/docs/api-reference/audio/create
     /// </summary>
     [JsonObject]
-    public sealed class APIRequestBody
+    public sealed class TranscriptionRequestBody
     {
         /// <summary>
         /// [Required]
@@ -50,24 +50,35 @@ namespace Mochineko.Whisper_API.Translation
         [JsonProperty("temperature")]
         public float? Temperature { get; }
 
-        public APIRequestBody(string file, Model model = Whisper_API.Model.Whisper1)
+        /// <summary>
+        /// [Optional]
+        /// The language of the input audio.
+        /// Supplying the input language in ISO-639-1 format will improve accuracy and latency.
+        /// See https://github.com/openai/whisper#available-models-and-languages
+        /// </summary>
+        [JsonProperty("language")]
+        public string? Language { get; }
+
+        public TranscriptionRequestBody(string file, Model model = Whisper_API.Model.Whisper1)
         {
             this.File = file;
             this.Model = model.ToText();
         }
 
-        public APIRequestBody(
+        public TranscriptionRequestBody(
             string file,
             string model,
             string? prompt = null,
-            string? responseFormat = "json",
-            float? temperature = 1f)
+            string? responseFormat = null,
+            float? temperature = null,
+            string? language = null)
         {
             this.File = file;
             this.Model = model;
             this.Prompt = prompt;
             this.ResponseFormat = responseFormat;
             this.Temperature = temperature;
+            this.Language = language;
         }
 
         internal static readonly string[] AvailableAudioFileFormats =
@@ -104,7 +115,7 @@ namespace Mochineko.Whisper_API.Translation
                     NullValueHandling = NullValueHandling.Ignore
                 });
 
-        public static APIRequestBody? FromJson(string json)
-            => JsonConvert.DeserializeObject<APIRequestBody>(json);
+        public static TranscriptionRequestBody? FromJson(string json)
+            => JsonConvert.DeserializeObject<TranscriptionRequestBody>(json);
     }
 }

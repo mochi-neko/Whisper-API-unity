@@ -3,20 +3,18 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Mochineko.Whisper_API.Transcription;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
-using APIResponseBody = Mochineko.Whisper_API.Transcription.APIResponseBody;
 
-namespace Mochineko.Whisper_API.Transcription.Tests
+namespace Mochineko.Whisper_API.Tests
 {
     [TestFixture]
-    internal sealed class TranscriptionTest
+    internal sealed class TranslationTest
     {
         [Test]
         [RequiresPlayMode(false)]
-        public async Task Transcribe()
+        public async Task Translate()
         {
             // This file is a target of .gitignore.
             var apiKeyPath = Path.Combine(
@@ -29,13 +27,13 @@ namespace Mochineko.Whisper_API.Transcription.Tests
                 Application.dataPath,
                 "Mochineko/Whisper_API.Tests/test.wav");
 
-            var connection = new WhisperTranscriptionConnection(apiKey, Model.Whisper1);
+            var connection = new Translation(apiKey, Model.Whisper1);
 
-            var result = await connection.TranscribeFromFileAsync(filePath, CancellationToken.None);
+            var result = await connection.TranslateFromFileAsync(filePath, CancellationToken.None);
 
             string.IsNullOrEmpty(result).Should().BeFalse();
 
-            var json = APIResponseBody.FromJson(result);
+            var json = TranslationResponseBody.FromJson(result);
 
             Debug.Log($"Result:\n{json?.Text}");
         }
