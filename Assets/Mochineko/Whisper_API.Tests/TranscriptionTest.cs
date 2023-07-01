@@ -2,6 +2,7 @@
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Mochineko.Relent.UncertainResult;
 using NUnit.Framework;
 using UnityEngine;
@@ -29,7 +30,7 @@ namespace Mochineko.Whisper_API.Tests
 
             using var httpClient = new System.Net.Http.HttpClient();
 
-            var result = await TranscriptionAPI
+            var apiResult = await TranscriptionAPI
                 .TranscribeFromFileAsync(
                     apiKey,
                     httpClient,
@@ -38,11 +39,12 @@ namespace Mochineko.Whisper_API.Tests
                         file: filePath,
                         Model.Whisper1),
                     CancellationToken.None);
-            switch (result)
+            switch (apiResult)
             {
                 case IUncertainSuccessResult<string> success:
-                    var json = TranscriptionResponseBody.FromJson(success.Result);
-                    Debug.Log($"Result:\n{json?.Text}");
+                    var result = TranscriptionResponseBody.FromJson(success.Result)?.Text;
+                    Debug.Log($"[Whisper_API.Tests] Result: {result}.");
+                    result?.Should().Be("とりあえず店の前、掃除しといてくれ。 内水も頼む。");
                     break;
                 
                 case IUncertainRetryableResult<string> retryable:
@@ -54,7 +56,7 @@ namespace Mochineko.Whisper_API.Tests
                     break;
                 
                 default:
-                    throw new UncertainResultPatternMatchException(nameof(result));
+                    throw new UncertainResultPatternMatchException(nameof(apiResult));
             }
         }
     }

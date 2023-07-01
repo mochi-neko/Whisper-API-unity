@@ -49,7 +49,7 @@ namespace Mochineko.Whisper_API
             
             if (cancellationToken.IsCancellationRequested)
             {
-                return UncertainResults.RetryWithTrace<string>($"Already canceled.");
+                return UncertainResults.RetryWithTrace<string>($"Already cancelled.");
             }
 
             // Create request
