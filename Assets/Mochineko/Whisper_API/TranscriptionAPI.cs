@@ -44,7 +44,7 @@ namespace Mochineko.Whisper_API
 
             if (!fileStream.CanRead)
             {
-                return UncertainResults.FailWithTrace<string>($"File stream is not readable.");
+                throw new InvalidOperationException("File stream must be readable.");
             }
             
             if (cancellationToken.IsCancellationRequested)
