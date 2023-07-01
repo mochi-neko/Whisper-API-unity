@@ -21,7 +21,7 @@ namespace Mochineko.Whisper_API.Samples
         /// </summary>
         [SerializeField] private string filePath = string.Empty;
 
-        private Translation? connection;
+        private TranslationAPI? connection;
 
         private void Start()
         {
@@ -29,7 +29,7 @@ namespace Mochineko.Whisper_API.Samples
             Assert.IsNotNull(apiKey);
 
             // Create instance of WhisperTranscriptionConnection.
-            connection = new Translation(apiKey);
+            connection = new TranslationAPI(apiKey);
             
             // If you want to specify response format, etc..., please use other initialization:
             // connection = new WhisperTranslationConnection(apiKey, new APIRequestBody(

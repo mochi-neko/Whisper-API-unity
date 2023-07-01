@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.IO;
 using Newtonsoft.Json;
 
@@ -67,6 +68,16 @@ namespace Mochineko.Whisper_API
             float? temperature = null,
             string? language = null)
         {
+            if (string.IsNullOrEmpty(file))
+            {
+                throw new ArgumentNullException(nameof(file));
+            }
+
+            if (!IsAvailableFormat(file))
+            {
+                throw new InvalidDataException(file);
+            }
+            
             this.File = file;
             this.Model = model.ToText();
             this.Prompt = prompt;
@@ -86,9 +97,9 @@ namespace Mochineko.Whisper_API
             ".webm",
         };
 
-        internal static bool IsAvailableFormat(string file)
+        internal static bool IsAvailableFormat(string filePath)
         {
-            var extension = Path.GetExtension(file);
+            var extension = Path.GetExtension(filePath);
             foreach (var available in AvailableAudioFileFormats)
             {
                 if (extension == available)

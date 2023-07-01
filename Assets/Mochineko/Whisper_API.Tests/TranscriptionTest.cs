@@ -2,7 +2,7 @@
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using FluentAssertions;
+using Mochineko.Relent.UncertainResult;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
@@ -29,19 +29,33 @@ namespace Mochineko.Whisper_API.Tests
 
             using var httpClient = new System.Net.Http.HttpClient();
 
-            var result = await Transcription
+            var result = await TranscriptionAPI
                 .TranscribeFromFileAsync(
                     apiKey,
                     httpClient,
                     filePath,
-                    Model.Whisper1,
+                    new TranscriptionRequestBody(
+                        file: filePath,
+                        Model.Whisper1),
                     CancellationToken.None);
-
-            string.IsNullOrEmpty(result).Should().BeFalse();
-
-            var json = TranscriptionResponseBody.FromJson(result);
-
-            Debug.Log($"Result:\n{json?.Text}");
+            switch (result)
+            {
+                case IUncertainSuccessResult<string> success:
+                    var json = TranscriptionResponseBody.FromJson(success.Result);
+                    Debug.Log($"Result:\n{json?.Text}");
+                    break;
+                
+                case IUncertainRetryableResult<string> retryable:
+                    Debug.LogError($"Retryable error -> {retryable.Message}");
+                    break;
+                
+                case IUncertainFailureResult<string> failure:
+                    Debug.LogError($"Failure error -> {failure.Message}");
+                    break;
+                
+                default:
+                    throw new UncertainResultPatternMatchException(nameof(result));
+            }
         }
     }
 }

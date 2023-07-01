@@ -27,7 +27,7 @@ namespace Mochineko.Whisper_API.Tests
                 Application.dataPath,
                 "Mochineko/Whisper_API.Tests/test.wav");
 
-            var connection = new Translation(apiKey, Model.Whisper1);
+            var connection = new TranslationAPI(apiKey, Model.Whisper1);
 
             var result = await connection.TranslateFromFileAsync(filePath, CancellationToken.None);
 

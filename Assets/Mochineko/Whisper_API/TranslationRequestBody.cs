@@ -50,21 +50,15 @@ namespace Mochineko.Whisper_API
         [JsonProperty("temperature")]
         public float? Temperature { get; }
 
-        public TranslationRequestBody(string file, Model model = Whisper_API.Model.Whisper1)
-        {
-            this.File = file;
-            this.Model = model.ToText();
-        }
-
         public TranslationRequestBody(
             string file,
-            string model,
+            Model model,
             string? prompt = null,
             string? responseFormat = null,
             float? temperature = null)
         {
             this.File = file;
-            this.Model = model;
+            this.Model = model.ToText();
             this.Prompt = prompt;
             this.ResponseFormat = responseFormat;
             this.Temperature = temperature;

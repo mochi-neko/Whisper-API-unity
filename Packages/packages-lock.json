@@ -14,6 +14,33 @@
       "dependencies": {},
       "hash": "73d86259ce31ce7f4dfe1d028ea1c3edf96c23e4"
     },
+    "com.mochineko.relent": {
+      "version": "https://github.com/mochi-neko/Relent.git?path=/Assets/Mochineko/Relent#0.2.0",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "5fd87387912763429e4c8008157ed6a654c3093c"
+    },
+    "com.mochineko.relent.extensions.newtonsoft-json": {
+      "version": "https://github.com/mochi-neko/Relent.git?path=/Assets/Mochineko/Relent.Extensions/NewtonsofJson#0.2.0",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.mochineko.relent": "https://github.com/mochi-neko/Relent.git?path=/Assets/Mochineko/Relent#0.2.0",
+        "com.unity.nuget.newtonsoft-json": "3.0.2"
+      },
+      "hash": "5fd87387912763429e4c8008157ed6a654c3093c"
+    },
+    "com.mochineko.relent.extensions.unitask": {
+      "version": "https://github.com/mochi-neko/Relent.git?path=/Assets/Mochineko/Relent.Extensions/UniTask#0.2.0",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.mochineko.relent": "https://github.com/mochi-neko/Relent.git?path=/Assets/Mochineko/Relent#0.2.0",
+        "com.cysharp.unitask": "https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask"
+      },
+      "hash": "5fd87387912763429e4c8008157ed6a654c3093c"
+    },
     "com.unity.ai.navigation": {
       "version": "1.1.3",
       "depth": 0,
