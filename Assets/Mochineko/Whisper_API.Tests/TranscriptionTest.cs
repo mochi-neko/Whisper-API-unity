@@ -31,11 +31,11 @@ namespace Mochineko.Whisper_API.Tests
             using var httpClient = new System.Net.Http.HttpClient();
 
             var apiResult = await TranscriptionAPI
-                .TranscribeFromFileAsync(
+                .TranscribeFileAsync(
                     apiKey,
                     httpClient,
                     filePath,
-                    new TranscriptionRequestBody(
+                    new TranscriptionRequestParameters(
                         file: filePath,
                         Model.Whisper1),
                     CancellationToken.None);

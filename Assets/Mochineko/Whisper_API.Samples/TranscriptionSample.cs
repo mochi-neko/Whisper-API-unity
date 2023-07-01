@@ -27,7 +27,7 @@ namespace Mochineko.Whisper_API.Samples
 
         private static readonly HttpClient httpClient = new();
 
-        private readonly TranscriptionRequestBody requestBody = new(
+        private readonly TranscriptionRequestParameters requestParameters = new(
             file: string.Empty,
             Model.Whisper1);
 
@@ -42,7 +42,7 @@ namespace Mochineko.Whisper_API.Samples
 
         private async UniTask TranscribeAsync(CancellationToken cancellationToken)
         {
-            requestBody.File = filePath;
+            requestParameters.File = filePath;
 
             await UniTask.SwitchToThreadPool();
 
@@ -50,11 +50,11 @@ namespace Mochineko.Whisper_API.Samples
             var result = await policy
                 .ExecuteAsync(async innerCancellationToken
                         => await TranscriptionAPI
-                            .TranscribeFromFileAsync(
+                            .TranscribeFileAsync(
                                 apiKey,
                                 httpClient,
                                 filePath,
-                                requestBody,
+                                requestParameters,
                                 innerCancellationToken),
                     cancellationToken);
 

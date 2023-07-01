@@ -5,11 +5,11 @@ using Newtonsoft.Json;
 namespace Mochineko.Whisper_API
 {
     /// <summary>
-    /// Request body of Whisper transcription API.
+    /// Request parameters of Whisper transcription API.
     /// See https://platform.openai.com/docs/api-reference/audio/create
     /// </summary>
     [JsonObject]
-    public sealed class TranslationRequestBody
+    public sealed class TranslationRequestParameters
     {
         /// <summary>
         /// [Required]
@@ -50,7 +50,7 @@ namespace Mochineko.Whisper_API
         [JsonProperty("temperature")]
         public float? Temperature { get; }
 
-        public TranslationRequestBody(
+        public TranslationRequestParameters(
             string file,
             Model model,
             string? prompt = null,
@@ -88,17 +88,5 @@ namespace Mochineko.Whisper_API
 
             return false;
         }
-
-        public string ToJson()
-            => JsonConvert.SerializeObject(
-                this,
-                Formatting.Indented,
-                new JsonSerializerSettings
-                {
-                    NullValueHandling = NullValueHandling.Ignore
-                });
-
-        public static TranslationRequestBody? FromJson(string json)
-            => JsonConvert.DeserializeObject<TranslationRequestBody>(json);
     }
 }
