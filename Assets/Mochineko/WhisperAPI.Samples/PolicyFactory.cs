@@ -6,7 +6,7 @@ using Mochineko.Relent.Resilience.Retry;
 using Mochineko.Relent.Resilience.Timeout;
 using Mochineko.Relent.Resilience.Wrap;
 
-namespace Mochineko.Whisper_API.Samples
+namespace Mochineko.WhisperAPI.Samples
 {
     internal static class PolicyFactory
     {

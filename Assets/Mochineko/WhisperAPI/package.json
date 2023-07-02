@@ -1,0 +1,11 @@
+{
+  "name": "com.mochineko.whisper-api",
+  "version": "1.0.0",
+  "displayName": "OpenAI Whisper API Client for Unity",
+  "description": "A client library of OpenAI Whisper API for Unity.",
+  "unity": "2022.3",
+  "author": {
+    "name": "Mochineko",
+    "email": "t.o.e.4315@gmail.com"
+  }
+}

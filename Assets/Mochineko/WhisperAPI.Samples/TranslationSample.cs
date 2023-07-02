@@ -1,12 +1,13 @@
 #nullable enable
 using System.Net.Http;
 using System.Threading;
+using Assets.Mochineko.WhisperAPI;
 using Cysharp.Threading.Tasks;
 using Mochineko.Relent.Resilience;
 using Mochineko.Relent.UncertainResult;
 using UnityEngine;
 
-namespace Mochineko.Whisper_API.Samples
+namespace Mochineko.WhisperAPI.Samples
 {
     /// <summary>
     /// A sample component to translate speech into English text by Whisper transcription API on Unity.

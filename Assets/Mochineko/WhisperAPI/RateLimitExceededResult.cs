@@ -1,7 +1,7 @@
 #nullable enable
 using Mochineko.Relent.UncertainResult;
 
-namespace Mochineko.Whisper_API
+namespace Assets.Mochineko.WhisperAPI
 {
     /// <summary>
     /// A result that indicates that the rate limit of API has been exceeded.

@@ -7,19 +7,19 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using Mochineko.Relent.UncertainResult;
 
-namespace Mochineko.Whisper_API
+namespace Assets.Mochineko.WhisperAPI
 {
     /// <summary>
-    /// OpenAI Whisper translation API.
+    /// OpenAI Whisper transcription API.
     /// Document: https://platform.openai.com/docs/guides/speech-to-text
     /// API reference: https://platform.openai.com/docs/api-reference/audio/create
     /// </summary>
-    public static class TranslationAPI
+    public static class TranscriptionAPI
     {
-        private const string EndPoint = "https://api.openai.com/v1/audio/translations";
-        
+        private const string EndPoint = "https://api.openai.com/v1/audio/transcriptions";
+
         /// <summary>
-        /// Translates speech audio into English text by Whisper translation API.
+        /// Transcribes speech audio into text by Whisper transcription API.
         /// https://platform.openai.com/docs/api-reference/audio/create
         /// </summary>
         /// <param name="apiKey">OpenAI API key.</param>
@@ -31,11 +31,11 @@ namespace Mochineko.Whisper_API
         /// <exception cref="ArgumentNullException"><paramref name="apiKey"/> must not be null.</exception>
         /// <exception cref="InvalidOperationException"><paramref name="fileStream"/> must be readable.</exception>
         /// <exception cref="UncertainResultPatternMatchException">Library bad implementation.</exception>
-        public static async UniTask<IUncertainResult<string>> TranslateAsync(
+        public static async UniTask<IUncertainResult<string>> TranscribeAsync(
             string apiKey,
             HttpClient httpClient,
             Stream fileStream,
-            TranslationRequestParameters parameters,
+            TranscriptionRequestParameters parameters,
             CancellationToken cancellationToken)
         {
             // Validate
@@ -141,9 +141,9 @@ namespace Mochineko.Whisper_API
                 );
             }
         }
-        
+
         /// <summary>
-        /// Translates speech audio into English text from file by Whisper translation API.
+        /// Transcribes speech audio into text from file by Whisper transcription API.
         /// https://platform.openai.com/docs/api-reference/audio/create
         /// </summary>
         /// <param name="apiKey">OpenAI API key.</param>
@@ -156,11 +156,11 @@ namespace Mochineko.Whisper_API
         /// <exception cref="FileNotFoundException"><paramref name="filePath"/> is not found.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="apiKey"/> must not be empty.</exception>
         /// <exception cref="UncertainResultPatternMatchException">Library bad implementation.</exception>
-        public static async UniTask<IUncertainResult<string>> TranslateFileAsync(
+        public static async UniTask<IUncertainResult<string>> TranscribeFileAsync(
             string apiKey,
             HttpClient httpClient,
             string filePath,
-            TranslationRequestParameters parameters,
+            TranscriptionRequestParameters parameters,
             CancellationToken cancellationToken)
         {
             if (string.IsNullOrEmpty(filePath))
@@ -175,7 +175,7 @@ namespace Mochineko.Whisper_API
 
             await using var fileStream = File.OpenRead(filePath);
 
-            return await TranslateAsync(
+            return await TranscribeAsync(
                 apiKey,
                 httpClient,
                 fileStream,

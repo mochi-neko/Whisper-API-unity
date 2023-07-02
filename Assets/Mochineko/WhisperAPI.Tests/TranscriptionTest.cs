@@ -2,13 +2,14 @@
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Assets.Mochineko.WhisperAPI;
 using FluentAssertions;
 using Mochineko.Relent.UncertainResult;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 
-namespace Mochineko.Whisper_API.Tests
+namespace Mochineko.WhisperAPI.Tests
 {
     [TestFixture]
     internal sealed class TranscriptionTest

@@ -1,7 +1,7 @@
 #nullable enable
 using Newtonsoft.Json;
 
-namespace Mochineko.Whisper_API
+namespace Assets.Mochineko.WhisperAPI
 {
     /// <summary>
     /// Response body of translation when specifying JSON format.

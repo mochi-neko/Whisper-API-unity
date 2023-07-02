@@ -1,9 +1,10 @@
 #nullable enable
+using Assets.Mochineko.WhisperAPI;
 using FluentAssertions;
 using NUnit.Framework;
 using UnityEngine.TestTools;
 
-namespace Mochineko.Whisper_API.Tests
+namespace Mochineko.WhisperAPI.Tests
 {
     [TestFixture]
     internal sealed class ModelTest

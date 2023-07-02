@@ -1,19 +1,19 @@
 {
-    "name": "Mochineko.Whisper_API",
+    "name": "Mochineko.WhisperAPI.Samples",
     "rootNamespace": "",
     "references": [
+        "GUID:12e7ae99596e14eef8970a67eb588899",
         "GUID:2620e54ab6edb48f48d55966fd5662fb",
+        "GUID:51d11816546934d4a937e4a420478ce5",
         "GUID:f51ebe6a0ceec4240a699833d6309b23"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": true,
-    "precompiledReferences": [
-        "Newtonsoft.Json.dll"
-    ],
+    "precompiledReferences": [],
     "autoReferenced": false,
     "defineConstraints": [],
     "versionDefines": [],
-    "noEngineReferences": true
+    "noEngineReferences": false
 }

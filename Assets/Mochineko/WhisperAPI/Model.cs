@@ -1,5 +1,5 @@
 #nullable enable
-namespace Mochineko.Whisper_API
+namespace Assets.Mochineko.WhisperAPI
 {
     /// <summary>
     /// Speech recognition model.
