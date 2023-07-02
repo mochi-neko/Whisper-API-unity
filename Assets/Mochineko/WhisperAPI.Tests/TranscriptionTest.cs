@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,19 +16,14 @@ namespace Mochineko.WhisperAPI.Tests
     internal sealed class TranscriptionTest
     {
         [Test]
-        [RequiresPlayMode(false)]
+        [RequiresPlayMode(true)]
         public async Task Transcribe()
         {
-            // This file is a target of .gitignore.
-            var apiKeyPath = Path.Combine(
-                Application.dataPath,
-                "Mochineko/Whisper_API.Tests/OpenAI_API_Key.txt");
-
-            var apiKey = await File.ReadAllTextAsync(apiKeyPath);
+            var apiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY");
 
             var filePath = Path.Combine(
                 Application.dataPath,
-                "Mochineko/Whisper_API.Tests/test.wav");
+                "Mochineko/WhisperAPI.Tests/test.wav");
 
             using var httpClient = new System.Net.Http.HttpClient();
 
@@ -40,26 +36,11 @@ namespace Mochineko.WhisperAPI.Tests
                         file: filePath,
                         Model.Whisper1,
                         temperature: 0f),
-                    CancellationToken.None);
-            switch (apiResult)
-            {
-                case IUncertainSuccessResult<string> success:
-                    var result = TranscriptionResponseBody.FromJson(success.Result)?.Text;
-                    Debug.Log($"[Whisper_API.Tests] Result: {result}.");
-                    result?.Should().Be("とりあえず店の前、掃除しといてくれ。 内水も頼む。");
-                    break;
-                
-                case IUncertainRetryableResult<string> retryable:
-                    Debug.LogError($"Retryable error -> {retryable.Message}");
-                    break;
-                
-                case IUncertainFailureResult<string> failure:
-                    Debug.LogError($"Failure error -> {failure.Message}");
-                    break;
-                
-                default:
-                    throw new UncertainResultPatternMatchException(nameof(apiResult));
-            }
+                    CancellationToken.None,
+                    debug: true);
+
+            var result = TranscriptionResponseBody.FromJson(apiResult.Unwrap())?.Text;
+            result?.Should().Be("とりあえず店の前、掃除しといてくれ。 内水も頼む。");
         }
     }
 }

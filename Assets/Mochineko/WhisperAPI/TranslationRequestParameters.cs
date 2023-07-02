@@ -2,6 +2,8 @@
 using System;
 using System.IO;
 using System.Net.Http;
+using Unity.Logging;
+using UnityEngine;
 
 namespace Assets.Mochineko.WhisperAPI
 {
@@ -22,7 +24,7 @@ namespace Assets.Mochineko.WhisperAPI
         /// ID of the model to use.
         /// Only whisper-1 is currently available.
         /// </summary>
-        public string Model { get; }
+        public Model Model { get; }
 
         /// <summary>
         /// [Optional] "prompt"
@@ -52,23 +54,8 @@ namespace Assets.Mochineko.WhisperAPI
             string? responseFormat = null,
             float? temperature = null)
         {
-            if (string.IsNullOrEmpty(file))
-            {
-                throw new ArgumentNullException(nameof(file));
-            }
-
-            if (!IsAvailableAudioFileFormat(file))
-            {
-                throw new InvalidDataException($"The file format is not available. The file format must be one of {string.Join(", ", AvailableAudioFileFormats)}");
-            }
-
-            if (responseFormat != null && !IsAvailableResponseFormat(responseFormat))
-            {
-                throw new InvalidDataException($"The response format is not available. The response format must be one of {string.Join(", ", AvailableResponseFormats)}");
-            }
-            
             this.File = file;
-            this.Model = model.ToText();
+            this.Model = model;
             this.Prompt = prompt;
             this.ResponseFormat = responseFormat;
             this.Temperature = temperature;
@@ -121,18 +108,52 @@ namespace Assets.Mochineko.WhisperAPI
             return false;
         }
 
-        public void SetParameters(MultipartFormDataContent content, Stream fileStream)
+        /// <summary>
+        /// Sets parameters to <see cref="MultipartFormDataContent"/> with stream.
+        /// </summary>
+        /// <param name="content">Target content</param>
+        /// <param name="fileStream">File stream</param>
+        /// <exception cref="InvalidDataException">Invalid parameters.</exception>
+        public void SetParameters(MultipartFormDataContent content, Stream fileStream, bool debug)
         {
+            if (string.IsNullOrEmpty(File))
+            {
+                Log.Fatal("[WhisperAPI.Translation] File text is empty.");
+                throw new InvalidDataException("File text is empty.");
+            }
+
+            if (!IsAvailableAudioFileFormat(File))
+            {
+                Log.Fatal("[WhisperAPI.Translation] The file format is not available. The file format must be one of {0}", string.Join(", ", AvailableAudioFileFormats));
+                throw new InvalidDataException($"The file format is not available. The file format must be one of {string.Join(", ", AvailableAudioFileFormats)}");
+            }
+
+            if (ResponseFormat != null && !IsAvailableResponseFormat(ResponseFormat))
+            {
+                Log.Fatal(
+                    "[WhisperAPI.Translation] The response format is not available. The response format must be one of {0}",
+                    string.Join(", ", AvailableResponseFormats));
+                throw new InvalidDataException($"The response format is not available. The response format must be one of {string.Join(", ", AvailableResponseFormats)}");
+            }
+            
             content.Add(
                 content: new StreamContent(content: fileStream),
                 name: "file",
                 fileName: File);
-            
+            if (debug)
+            {
+                Log.Debug("[WhisperAPI.Translation] Request parameter: file = {0},", File);
+            }
+
             content.Add(
                 content: new StringContent(
-                    content: Model,
+                    content: Model.ToText(),
                     encoding: System.Text.Encoding.UTF8),
                 name: "model");
+            if (debug)
+            {
+                Log.Debug("[WhisperAPI.Translation] Request parameter: model = {0},", Model.ToText());
+            }
 
             if (Prompt != null)
             {
@@ -141,8 +162,12 @@ namespace Assets.Mochineko.WhisperAPI
                         content: Prompt,
                         encoding: System.Text.Encoding.UTF8),
                     name: "prompt");
+                if (debug)
+                {
+                    Log.Debug("[WhisperAPI.Translation] Request parameter: prompt = {0},", Prompt);
+                }
             }
-            
+
             if (ResponseFormat != null)
             {
                 content.Add(
@@ -150,8 +175,12 @@ namespace Assets.Mochineko.WhisperAPI
                         content: ResponseFormat,
                         encoding: System.Text.Encoding.UTF8),
                     name: "response_format");
+                if (debug)
+                {
+                    Log.Debug("[WhisperAPI.Translation] Request parameter: response_format = {0},", ResponseFormat);
+                }
             }
-            
+
             if (Temperature != null)
             {
                 content.Add(
@@ -159,6 +188,10 @@ namespace Assets.Mochineko.WhisperAPI
                         content: Temperature.ToString(),
                         encoding: System.Text.Encoding.UTF8),
                     name: "temperature");
+                if (debug)
+                {
+                    Log.Debug("[WhisperAPI.Translation] Request parameter: temperature = {0},", Temperature.Value);
+                }
             }
         }
     }
