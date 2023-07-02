@@ -45,6 +45,8 @@ namespace Mochineko.Whisper_API.Samples
             requestParameters.File = filePath;
 
             await UniTask.SwitchToThreadPool();
+            
+            Debug.Log($"[Whisper_API.Samples] Begin to transcribe.");
 
             // Transcribe speech into text by Whisper transcription API.
             var result = await policy
@@ -68,19 +70,19 @@ namespace Mochineko.Whisper_API.Samples
                     // Default text response format is JSON.
                     var text = TranscriptionResponseBody.FromJson(success.Result)?.Text;
                     // Log text result.
-                    Debug.Log($"[Whisper_API.Transcription.Samples] Succeeded to transcribe into: {text}.");
+                    Debug.Log($"[Whisper_API.Samples] Succeeded to transcribe into: {text}.");
                     break;
                 }
                 // Retryable failure
                 case IUncertainRetryableResult<string> retryable:
                 {
-                    Debug.LogError($"[Whisper_API.Transcription.Samples] Failed to transcribe because -> {retryable.Message}.");
+                    Debug.LogError($"[Whisper_API.Samples] Failed to transcribe because -> {retryable.Message}.");
                     break;
                 }
                 // Failure
                 case IUncertainFailureResult<string> failure:
                 {
-                    Debug.LogError($"[Whisper_API.Transcription.Samples] Failed to transcribe because -> {failure.Message}.");
+                    Debug.LogError($"[Whisper_API.Samples] Failed to transcribe because -> {failure.Message}.");
                     break;
                 }
                 default:

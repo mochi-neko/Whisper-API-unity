@@ -1,63 +1,56 @@
 #nullable enable
 using System;
 using System.IO;
-using Newtonsoft.Json;
+using System.Net.Http;
 
 namespace Mochineko.Whisper_API
 {
     /// <summary>
     /// Request parameters of Whisper transcription API.
-    /// See https://platform.openai.com/docs/api-reference/audio/create
+    /// https://platform.openai.com/docs/api-reference/audio/create
     /// </summary>
-    [JsonObject]
     public sealed class TranscriptionRequestParameters
     {
         /// <summary>
-        /// [Required]
-        /// The audio file to transcribe, in one of these formats: mp3, mp4, mpeg, mpga, m4a, wav, or webm.
+        /// [Required] "file"
+        /// The audio file object (not file name) to transcribe, in one of these formats: mp3, mp4, mpeg, mpga, m4a, wav, or webm.
         /// </summary>
-        [JsonProperty("file"), JsonRequired]
         public string File { get; set; }
 
         /// <summary>
-        /// [Required]
+        /// [Required] "model"
         /// ID of the model to use.
-        /// Only whisper-1 is currently available.
+        /// Only `whisper-1` is currently available.
         /// </summary>
-        [JsonProperty("model"), JsonRequired]
         public string Model { get; }
 
         /// <summary>
-        /// [Optional]
+        /// [Optional] "prompt"
         /// An optional text to guide the model's style or continue a previous audio segment.
         /// The prompt should match the audio language.
         /// </summary>
-        [JsonProperty("prompt")]
         public string? Prompt { get; }
 
         /// <summary>
-        /// [Optional] Defaults to json
+        /// [Optional] "response_format" Defaults to json
         /// The format of the transcript output, in one of these options: json, text, srt, verbose_json, or vtt.
         /// </summary>
-        [JsonProperty("response_format")]
         public string? ResponseFormat { get; }
 
         /// <summary>
-        /// [Optional] Defaults to 1.
+        /// [Optional] "temperature" Defaults to 0.
         /// The sampling temperature, between 0 and 1.
         /// Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic.
         /// If set to 0, the model will use log probability to automatically increase the temperature until certain thresholds are hit.
         /// </summary>
-        [JsonProperty("temperature")]
         public float? Temperature { get; }
 
         /// <summary>
-        /// [Optional]
+        /// [Optional] "language"
         /// The language of the input audio.
         /// Supplying the input language in ISO-639-1 format will improve accuracy and latency.
         /// See https://github.com/openai/whisper#available-models-and-languages
         /// </summary>
-        [JsonProperty("language")]
         public string? Language { get; }
 
         public TranscriptionRequestParameters(
@@ -73,9 +66,14 @@ namespace Mochineko.Whisper_API
                 throw new ArgumentNullException(nameof(file));
             }
 
-            if (!IsAvailableFormat(file))
+            if (!IsAvailableAudioFileFormat(file))
             {
-                throw new InvalidDataException(file);
+                throw new InvalidDataException($"The file format is not available. The file format must be one of {string.Join(", ", AvailableAudioFileFormats)}");
+            }
+
+            if (responseFormat != null && !IsAvailableResponseFormat(responseFormat))
+            {
+                throw new InvalidDataException($"The response format is not available. The response format must be one of {string.Join(", ", AvailableResponseFormats)}");
             }
             
             this.File = file;
@@ -96,8 +94,17 @@ namespace Mochineko.Whisper_API
             ".wav",
             ".webm",
         };
+        
+        internal static readonly string[] AvailableResponseFormats =
+        {
+            "json",
+            "text",
+            "srt",
+            "verbose_json",
+            "vtt",
+        };
 
-        internal static bool IsAvailableFormat(string filePath)
+        public static bool IsAvailableAudioFileFormat(string filePath)
         {
             var extension = Path.GetExtension(filePath);
             foreach (var available in AvailableAudioFileFormats)
@@ -109,6 +116,69 @@ namespace Mochineko.Whisper_API
             }
 
             return false;
+        }
+        
+        public static bool IsAvailableResponseFormat(string responseFormat)
+        {
+            foreach (var available in AvailableResponseFormats)
+            {
+                if (responseFormat == available)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public void SetParameters(MultipartFormDataContent content, Stream fileStream)
+        {
+            content.Add(
+                content: new StreamContent(content: fileStream),
+                name: "file",
+                fileName: File);
+            
+            content.Add(
+                content: new StringContent(
+                    content: Model,
+                    encoding: System.Text.Encoding.UTF8),
+                name: "model");
+
+            if (Prompt != null)
+            {
+                content.Add(
+                    content: new StringContent(
+                        content: Prompt,
+                        encoding: System.Text.Encoding.UTF8),
+                    name: "prompt");
+            }
+            
+            if (ResponseFormat != null)
+            {
+                content.Add(
+                    content: new StringContent(
+                        content: ResponseFormat,
+                        encoding: System.Text.Encoding.UTF8),
+                    name: "response_format");
+            }
+            
+            if (Temperature != null)
+            {
+                content.Add(
+                    content: new StringContent(
+                        content: Temperature.ToString(),
+                        encoding: System.Text.Encoding.UTF8),
+                    name: "temperature");
+            }
+            
+            if (Language != null)
+            {
+                content.Add(
+                    content: new StringContent(
+                        content: Language,
+                        encoding: System.Text.Encoding.UTF8),
+                    name: "language");
+            }
         }
     }
 }

@@ -3,6 +3,9 @@ using Newtonsoft.Json;
 
 namespace Mochineko.Whisper_API
 {
+    /// <summary>
+    /// Response body of translation when specifying JSON format.
+    /// </summary>
     [JsonObject]
     public sealed class TranslationResponseBody
     {

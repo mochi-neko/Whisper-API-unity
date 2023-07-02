@@ -56,50 +56,13 @@ namespace Mochineko.Whisper_API
 
             // Create request
             var requestMessage = new HttpRequestMessage(HttpMethod.Post, EndPoint);
+            
             requestMessage
                 .Headers
                 .Add("Authorization", $"Bearer {apiKey}");
 
             var requestContent = new MultipartFormDataContent();
-
-            requestContent.Add(
-                content: new StringContent(
-                    content: parameters.Model,
-                    encoding: System.Text.Encoding.UTF8),
-                name: "model");
-
-            requestContent.Add(
-                content: new StreamContent(content: fileStream),
-                name: "file",
-                fileName: parameters.File);
-            
-            if (parameters.Prompt != null)
-            {
-                requestContent.Add(
-                    content: new StringContent(
-                        content: parameters.Prompt,
-                        encoding: System.Text.Encoding.UTF8),
-                    name: "prompt");
-            }
-            
-            if (parameters.ResponseFormat != null)
-            {
-                requestContent.Add(
-                    content: new StringContent(
-                        content: parameters.ResponseFormat,
-                        encoding: System.Text.Encoding.UTF8),
-                    name: "response_format");
-            }
-            
-            if (parameters.Temperature != null)
-            {
-                requestContent.Add(
-                    content: new StringContent(
-                        content: parameters.Temperature.ToString(),
-                        encoding: System.Text.Encoding.UTF8),
-                    name: "temperature");
-            }
-            
+            parameters.SetParameters(requestContent, fileStream);
             requestMessage.Content = requestContent;
 
             // Send request

@@ -37,7 +37,8 @@ namespace Mochineko.Whisper_API.Tests
                     filePath,
                     new TranscriptionRequestParameters(
                         file: filePath,
-                        Model.Whisper1),
+                        Model.Whisper1,
+                        temperature: 0f),
                     CancellationToken.None);
             switch (apiResult)
             {
