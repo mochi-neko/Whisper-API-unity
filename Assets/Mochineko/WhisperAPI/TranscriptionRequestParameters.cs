@@ -121,6 +121,7 @@ namespace Assets.Mochineko.WhisperAPI
         /// </summary>
         /// <param name="content">Target content</param>
         /// <param name="fileStream">File stream</param>
+        /// <param name="debug">Log debug information.</param>
         /// <exception cref="InvalidDataException">Invalid parameters.</exception>
         public void SetParameters(MultipartFormDataContent content, Stream fileStream, bool debug)
         {

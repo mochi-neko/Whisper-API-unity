@@ -16,10 +16,14 @@ namespace Mochineko.WhisperAPI.Tests
     internal sealed class TranslationTest
     {
         [Test]
-        [RequiresPlayMode(true)]
+        [RequiresPlayMode(false)]
         public async Task Translate()
         {
             var apiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY");
+            if (string.IsNullOrEmpty(apiKey))
+            {
+                throw new NullReferenceException(nameof(apiKey));
+            }
 
             var filePath = Path.Combine(
                 Application.dataPath,

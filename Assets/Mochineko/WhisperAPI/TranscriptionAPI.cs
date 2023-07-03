@@ -73,6 +73,7 @@ namespace Assets.Mochineko.WhisperAPI
             parameters.SetParameters(requestContent, fileStream, debug);
             requestMessage.Content = requestContent;
 
+            // Run request on a thread pool
             await UniTask.SwitchToThreadPool();
             
             // Send request
@@ -86,12 +87,15 @@ namespace Assets.Mochineko.WhisperAPI
                     => $"Retryable due to cancellation exception -> {exception}.")
                 .CatchAsFailure<HttpResponseMessage, Exception>(exception
                     => $"Failure due to unhandled -> {exception}.")
-                .Finalize(async () =>
+                .Finalize(() =>
                 {
                     requestMessage.Dispose();
-                    await UniTask.SwitchToMainThread(cancellationToken);
+                    return UniTask.CompletedTask;
                 })
                 .ExecuteAsync(cancellationToken);
+            
+            await UniTask.SwitchToMainThread();
+            
             switch (apiResult)
             {
                 case IUncertainSuccessResult<HttpResponseMessage> apiSuccess:
@@ -120,6 +124,7 @@ namespace Assets.Mochineko.WhisperAPI
             // Dispose response message when out of scope
             using var _ = responseMessage;
 
+            // Read response content
             if (responseMessage.Content == null)
             {
                 Log.Error("[WhisperAPI.Transcription] Response content is null.");
@@ -137,7 +142,9 @@ namespace Assets.Mochineko.WhisperAPI
 
             if (debug)
             {
-                Log.Debug("[WhisperAPI] Response content with status code({0}):\n{1}", (int)responseMessage.StatusCode,
+                Log.Debug("[WhisperAPI.Transcription] Response content with status code:({0}){1}, response:\n{2}",
+                    (int)responseMessage.StatusCode,
+                    responseMessage.StatusCode,
                     responseText);
             }
 
@@ -146,7 +153,7 @@ namespace Assets.Mochineko.WhisperAPI
             {
                 if (debug)
                 {
-                    Log.Debug("[WhisperAPI.Transcription] Succeed: {0}.", responseText);
+                    Log.Debug("[WhisperAPI.Transcription] Succeed:\n{0}.", responseText);
                 }
 
                 // Text format is determined by request parameter:"response_format",
@@ -157,31 +164,31 @@ namespace Assets.Mochineko.WhisperAPI
             else if (responseMessage.StatusCode is HttpStatusCode.TooManyRequests)
             {
                 Log.Error(
-                    "[WhisperAPI.Transcription] Retryable because the API has exceeded rate limit with status code:({0}){1}, error response:{2}.",
+                    "[WhisperAPI.Transcription] Retryable because the API has exceeded rate limit with status code:({0}){1}, error response:\n{2}.",
                     (int)responseMessage.StatusCode, responseMessage.StatusCode, responseText);
 
                 return new RateLimitExceededResult<string>(
-                    $"Retryable because the API has exceeded rate limit with status code:({(int)responseMessage.StatusCode}){responseMessage.StatusCode}, error response:{responseText}.");
+                    $"Retryable because the API has exceeded rate limit with status code:({(int)responseMessage.StatusCode}){responseMessage.StatusCode}, error response:\n{responseText}.");
             }
             // Retryable
             else if ((int)responseMessage.StatusCode is >= 500 and <= 599)
             {
                 Log.Error(
-                        "[WhisperAPI.Transcription] Retryable because the API returned status code:({0}){1}, error response:{2}.",
+                        "[WhisperAPI.Transcription] Retryable because the API returned status code:({0}){1}, error response:\n{2}.",
                         (int)responseMessage.StatusCode, responseMessage.StatusCode, responseText);
 
                 return UncertainResults.RetryWithTrace<string>(
-                    $"Retryable because the API returned status code:({(int)responseMessage.StatusCode}){responseMessage.StatusCode}, error response:{responseText}.");
+                    $"Retryable because the API returned status code:({(int)responseMessage.StatusCode}){responseMessage.StatusCode}, error response:\n{responseText}.");
             }
             // Response error
             else
             {
                 Log.Error(
-                        "[WhisperAPI.Transcription] Failed because the API returned status code:({0}){1}, error response:{2}.",
+                        "[WhisperAPI.Transcription] Failed because the API returned status code:({0}){1}, error response:\n{2}.",
                         (int)responseMessage.StatusCode, responseMessage.StatusCode, responseText);
 
                 return UncertainResults.FailWithTrace<string>(
-                    $"Failed because the API returned status code:({(int)responseMessage.StatusCode}){responseMessage.StatusCode}, error response:{responseText}."
+                    $"Failed because the API returned status code:({(int)responseMessage.StatusCode}){responseMessage.StatusCode}, error response:\n{responseText}."
                 );
             }
         }
@@ -221,7 +228,7 @@ namespace Assets.Mochineko.WhisperAPI
                 Log.Fatal("[WhisperAPI.Transcription] File is not found at {0}", filePath);
                 throw new FileNotFoundException(filePath);
             }
-
+            
             await using var fileStream = File.OpenRead(filePath);
 
             return await TranscribeAsync(

@@ -39,11 +39,13 @@ namespace Mochineko.WhisperAPI.Samples
         private async UniTask TranslateAsync(CancellationToken cancellationToken)
         {
             var apiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY");
+            if (string.IsNullOrEmpty(apiKey))
+            {
+                throw new NullReferenceException(nameof(apiKey));
+            }
             
             requestParameters.File = filePath;
 
-            await UniTask.SwitchToThreadPool();
-            
             Debug.Log($"[Whisper_API.Samples] Begin to translate.");
 
             // Translate speech into English text by Whisper transcription API.
@@ -59,8 +61,6 @@ namespace Mochineko.WhisperAPI.Samples
                                 debug: true),
                     cancellationToken);
 
-            await UniTask.SwitchToMainThread(cancellationToken);
-            
             switch (result)
             {
                 // Success

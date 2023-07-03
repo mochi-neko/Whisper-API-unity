@@ -16,10 +16,14 @@ namespace Mochineko.WhisperAPI.Tests
     internal sealed class TranscriptionTest
     {
         [Test]
-        [RequiresPlayMode(true)]
+        [RequiresPlayMode(false)]
         public async Task Transcribe()
         {
             var apiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY");
+            if (string.IsNullOrEmpty(apiKey))
+            {
+                throw new NullReferenceException(nameof(apiKey));
+            }
 
             var filePath = Path.Combine(
                 Application.dataPath,
@@ -37,7 +41,7 @@ namespace Mochineko.WhisperAPI.Tests
                         Model.Whisper1,
                         temperature: 0f),
                     CancellationToken.None,
-                    debug: true);
+                    debug: false);
 
             var result = TranscriptionResponseBody.FromJson(apiResult.Unwrap())?.Text;
             result?.Should().Be("とりあえず店の前、掃除しといてくれ。 内水も頼む。");

@@ -1,9 +1,7 @@
 #nullable enable
-using System;
 using System.IO;
 using System.Net.Http;
 using Unity.Logging;
-using UnityEngine;
 
 namespace Assets.Mochineko.WhisperAPI
 {
@@ -113,6 +111,7 @@ namespace Assets.Mochineko.WhisperAPI
         /// </summary>
         /// <param name="content">Target content</param>
         /// <param name="fileStream">File stream</param>
+        /// <param name="debug">Log debug information.</param>
         /// <exception cref="InvalidDataException">Invalid parameters.</exception>
         public void SetParameters(MultipartFormDataContent content, Stream fileStream, bool debug)
         {

@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.IO;
 using System.Net.Http;
 using System.Threading;
 using Assets.Mochineko.WhisperAPI;
@@ -19,8 +20,7 @@ namespace Mochineko.WhisperAPI.Samples
         /// <summary>
         /// File path of speech audio.
         /// </summary>
-        [SerializeField]
-        private string filePath = string.Empty;
+        [SerializeField] private string filePath = string.Empty;
 
         private static readonly HttpClient httpClient = new();
 
@@ -44,7 +44,16 @@ namespace Mochineko.WhisperAPI.Samples
         private async UniTask TranscribeAsync(CancellationToken cancellationToken)
         {
             var apiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY");
-            
+            if (string.IsNullOrEmpty(apiKey))
+            {
+                throw new NullReferenceException(nameof(apiKey));
+            }
+
+            var absoluteFilePath = Path.Combine(
+                Application.dataPath,
+                "..",
+                filePath);
+
             requestParameters.File = filePath;
 
             Log.Debug("[Whisper_API.Samples] Begin to transcribe.");
@@ -56,7 +65,7 @@ namespace Mochineko.WhisperAPI.Samples
                             .TranscribeFileAsync(
                                 apiKey,
                                 httpClient,
-                                filePath,
+                                absoluteFilePath,
                                 requestParameters,
                                 innerCancellationToken,
                                 debug: true),

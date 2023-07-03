@@ -72,11 +72,8 @@ namespace Assets.Mochineko.WhisperAPI
             parameters.SetParameters(requestContent, fileStream, debug);
             requestMessage.Content = requestContent;
 
-            if (debug)
-            {
-                var requestText = await requestMessage.Content.ReadAsStringAsync();
-                Log.Debug("[WhisperAPI.Translation] Request content:\n{0}", requestText);
-            }
+            // Run request on a thread pool
+            await UniTask.SwitchToThreadPool();
 
             // Send request
             HttpResponseMessage responseMessage;
@@ -95,6 +92,9 @@ namespace Assets.Mochineko.WhisperAPI
                     return UniTask.CompletedTask;
                 })
                 .ExecuteAsync(cancellationToken);
+
+            await UniTask.SwitchToMainThread();
+            
             switch (apiResult)
             {
                 case IUncertainSuccessResult<HttpResponseMessage> apiSuccess:
@@ -136,6 +136,14 @@ namespace Assets.Mochineko.WhisperAPI
                 Log.Error("[WhisperAPI.Translation] Response body is empty.");
                 return UncertainResults.FailWithTrace<string>(
                     $"Response body is empty.");
+            }
+            
+            if (debug)
+            {
+                Log.Debug("[WhisperAPI.Translation] Response content with status code:({0}){1}, response:\n{2}",
+                    (int)responseMessage.StatusCode,
+                    responseMessage.StatusCode,
+                    responseText);
             }
 
             // Success
