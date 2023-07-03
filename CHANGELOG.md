@@ -7,11 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0] - 2023-07-03
+
+### Added
+- Add logging by `com.unity.logging`.
+- Add detailed error handling by `Relent`.
+
+### Changed
+- Renewal interface of transcription API using `Relent` and `UniTask`.
+- Renewal interface of translation API using `Relent` and `UniTask`.
+- Rename directory, namespace and assembly from `Whisper_API` to `WhisperAPI`.
+- Change Unity version from 2021.3 to 2022.3.
+
+### Fixed
+- Fix to set optional request parameters. 
+
 ## [0.1.0] - 2023-03-08
 
 ### Added
-
-- Implement Whisper transctiption API bindings to C#.
-- Implement sample component of transctiption.
+- Implement Whisper transcription API bindings to C#.
+- Implement sample component of transcription.
 - Implement Whisper translation API bindings to C#.
 - Implement sample component of translation.
