@@ -17,7 +17,7 @@ Add following dependencies to your `/Packages/manifest.json`.
 ```json
 {
   "dependencies": {
-    "com.mochineko.whisper-api": "https://github.com/mochi-neko/Whisper-API-unity.git?path=/Assets/Mochineko/Whisper_API#1.0.0",
+    "com.mochineko.whisper-api": "https://github.com/mochi-neko/Whisper-API-unity.git?path=/Assets/Mochineko/WhisperAPI#1.0.0",
     ...
   }
 }
