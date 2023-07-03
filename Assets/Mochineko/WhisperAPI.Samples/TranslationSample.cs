@@ -1,11 +1,13 @@
 #nullable enable
 using System;
+using System.IO;
 using System.Net.Http;
 using System.Threading;
 using Assets.Mochineko.WhisperAPI;
 using Cysharp.Threading.Tasks;
 using Mochineko.Relent.Resilience;
 using Mochineko.Relent.UncertainResult;
+using Unity.Logging;
 using UnityEngine;
 
 namespace Mochineko.WhisperAPI.Samples
@@ -15,19 +17,18 @@ namespace Mochineko.WhisperAPI.Samples
     /// </summary>
     public sealed class TranslationSample : MonoBehaviour
     {
+        private static readonly HttpClient httpClient = new();
+
         /// <summary>
         /// File path of speech audio.
         /// </summary>
-        [SerializeField]
-        private string filePath = string.Empty;
-        
-        private static readonly HttpClient httpClient = new();
-
-        private readonly TranslationRequestParameters requestParameters = new(
-            file: string.Empty,
-            Model.Whisper1);
+        [SerializeField] private string filePath = string.Empty;
 
         private readonly IPolicy<string> policy = PolicyFactory.Build();
+
+        private readonly TranslationRequestParameters requestParameters = new(
+            string.Empty,
+            Model.Whisper1);
 
         [ContextMenu(nameof(Translate))]
         public void Translate()
@@ -39,14 +40,16 @@ namespace Mochineko.WhisperAPI.Samples
         private async UniTask TranslateAsync(CancellationToken cancellationToken)
         {
             var apiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY");
-            if (string.IsNullOrEmpty(apiKey))
-            {
-                throw new NullReferenceException(nameof(apiKey));
-            }
-            
+            if (string.IsNullOrEmpty(apiKey)) throw new NullReferenceException(nameof(apiKey));
+
+            var absoluteFilePath = Path.Combine(
+                Application.dataPath,
+                "..",
+                filePath);
+
             requestParameters.File = filePath;
 
-            Debug.Log($"[Whisper_API.Samples] Begin to translate.");
+            Log.Debug("[WhisperAPI.Samples] Begin to translate.");
 
             // Translate speech into English text by Whisper transcription API.
             var result = await policy
@@ -55,10 +58,10 @@ namespace Mochineko.WhisperAPI.Samples
                             .TranslateFileAsync(
                                 apiKey,
                                 httpClient,
-                                filePath,
+                                absoluteFilePath,
                                 requestParameters,
                                 innerCancellationToken,
-                                debug: true),
+                                true),
                     cancellationToken);
 
             switch (result)
@@ -68,20 +71,19 @@ namespace Mochineko.WhisperAPI.Samples
                 {
                     // Default text response format is JSON.
                     var text = TranslationResponseBody.FromJson(success.Result)?.Text;
-                    // Log text result.
-                    Debug.Log($"[Whisper_API.Samples] Succeeded to translate into: {text}.");
+                    Log.Debug("[WhisperAPI.Samples] Succeeded to translate into: {0}.", text);
                     break;
                 }
                 // Retryable failure
                 case IUncertainRetryableResult<string> retryable:
                 {
-                    Debug.LogError($"[Whisper_API.Samples] Failed to translate because -> {retryable.Message}.");
+                    Log.Error("[WhisperAPI.Samples] Retryable failed to translate because -> {0}.", retryable.Message);
                     break;
                 }
                 // Failure
                 case IUncertainFailureResult<string> failure:
                 {
-                    Debug.LogError($"[Whisper_API.Samples] Failed to translate because -> {failure.Message}.");
+                    Log.Error("[WhisperAPI.Samples] Failed to translate because -> {0}.", failure.Message);
                     break;
                 }
                 default:

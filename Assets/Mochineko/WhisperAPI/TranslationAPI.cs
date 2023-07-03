@@ -24,14 +24,14 @@ namespace Assets.Mochineko.WhisperAPI
         /// https://platform.openai.com/docs/api-reference/audio/create
         /// </summary>
         /// <param name="apiKey">OpenAI API key.</param>
-        /// <param name="httpClient"><see cref="HttpClient"/> instance.</param>
+        /// <param name="httpClient"><see cref="HttpClient" /> instance.</param>
         /// <param name="fileStream">Speech audio file stream.</param>
         /// <param name="parameters">API request parameters.</param>
         /// <param name="cancellationToken">Operation cancellation token.</param>
         /// <param name="debug">Log debug information.</param>
         /// <returns>Response text that is specified format by request body (Default is JSON).</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="apiKey"/> must not be null.</exception>
-        /// <exception cref="InvalidOperationException"><paramref name="fileStream"/> must be readable.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="apiKey" /> must not be null.</exception>
+        /// <exception cref="InvalidOperationException"><paramref name="fileStream" /> must be readable.</exception>
         /// <exception cref="InvalidDataException">Invalid request parameters.</exception>
         /// <exception cref="UncertainResultPatternMatchException">Library bad implementation.</exception>
         public static async UniTask<IUncertainResult<string>> TranslateAsync(
@@ -58,7 +58,7 @@ namespace Assets.Mochineko.WhisperAPI
             if (cancellationToken.IsCancellationRequested)
             {
                 Log.Error("[WhisperAPI.Translation] Already cancelled.");
-                return UncertainResults.RetryWithTrace<string>($"Already cancelled.");
+                return UncertainResults.RetryWithTrace<string>("Already cancelled.");
             }
 
             // Create request
@@ -94,7 +94,7 @@ namespace Assets.Mochineko.WhisperAPI
                 .ExecuteAsync(cancellationToken);
 
             await UniTask.SwitchToMainThread();
-            
+
             switch (apiResult)
             {
                 case IUncertainSuccessResult<HttpResponseMessage> apiSuccess:
@@ -127,7 +127,7 @@ namespace Assets.Mochineko.WhisperAPI
             {
                 Log.Error("[WhisperAPI.Translation] Response content is null.");
                 return UncertainResults.FailWithTrace<string>(
-                    $"Response content is null.");
+                    "Response content is null.");
             }
 
             var responseText = await responseMessage.Content.ReadAsStringAsync();
@@ -135,9 +135,9 @@ namespace Assets.Mochineko.WhisperAPI
             {
                 Log.Error("[WhisperAPI.Translation] Response body is empty.");
                 return UncertainResults.FailWithTrace<string>(
-                    $"Response body is empty.");
+                    "Response body is empty.");
             }
-            
+
             if (debug)
             {
                 Log.Debug("[WhisperAPI.Translation] Response content with status code:({0}){1}, response:\n{2}",
@@ -159,22 +159,22 @@ namespace Assets.Mochineko.WhisperAPI
                 return UncertainResults.Succeed(responseText);
             }
             // Rate limit exceeded
-            else if (responseMessage.StatusCode is HttpStatusCode.TooManyRequests)
+            if (responseMessage.StatusCode is HttpStatusCode.TooManyRequests)
             {
                 Log.Error(
-                        "[WhisperAPI.Translation] Retryable because the API has exceeded rate limit with status code:({0}){1}, error response:{2}.",
-                        (int)responseMessage.StatusCode, responseMessage.StatusCode, responseText);
+                    "[WhisperAPI.Translation] Retryable because the API has exceeded rate limit with status code:({0}){1}, error response:{2}.",
+                    (int)responseMessage.StatusCode, responseMessage.StatusCode, responseText);
 
                 return new RateLimitExceededResult<string>(
                     $"Retryable because the API has exceeded rate limit with status code:({(int)responseMessage.StatusCode}){responseMessage.StatusCode}, error response:{responseText}.");
             }
             // Retryable
-            else if ((int)responseMessage.StatusCode is >= 500 and <= 599)
+            if ((int)responseMessage.StatusCode is >= 500 and <= 599)
             {
                 Log.Error(
-                        "[WhisperAPI.Translation] Retryable because the API returned status code:({0}){1}, error response:{2}.",
-                        (int)responseMessage.StatusCode, responseMessage.StatusCode, responseText);
-                
+                    "[WhisperAPI.Translation] Retryable because the API returned status code:({0}){1}, error response:{2}.",
+                    (int)responseMessage.StatusCode, responseMessage.StatusCode, responseText);
+
                 return UncertainResults.RetryWithTrace<string>(
                     $"Retryable because the API returned status code:({(int)responseMessage.StatusCode}){responseMessage.StatusCode}, error response:{responseText}.");
             }
@@ -182,8 +182,8 @@ namespace Assets.Mochineko.WhisperAPI
             else
             {
                 Log.Error(
-                        "[WhisperAPI.Translation] Failed because the API returned status code:({0}){1}, error response:{2}.",
-                        (int)responseMessage.StatusCode, responseMessage.StatusCode, responseText);
+                    "[WhisperAPI.Translation] Failed because the API returned status code:({0}){1}, error response:{2}.",
+                    (int)responseMessage.StatusCode, responseMessage.StatusCode, responseText);
 
                 return UncertainResults.FailWithTrace<string>(
                     $"Failed because the API returned status code:({(int)responseMessage.StatusCode}){responseMessage.StatusCode}, error response:{responseText}."
@@ -192,19 +192,19 @@ namespace Assets.Mochineko.WhisperAPI
         }
 
         /// <summary>
-        /// Translates speech audio into English text from file by Whisper translation API.
-        /// https://platform.openai.com/docs/api-reference/audio/create
+        ///     Translates speech audio into English text from file by Whisper translation API.
+        ///     https://platform.openai.com/docs/api-reference/audio/create
         /// </summary>
         /// <param name="apiKey">OpenAI API key.</param>
-        /// <param name="httpClient"><see cref="HttpClient"/> instance.</param>
+        /// <param name="httpClient"><see cref="HttpClient" /> instance.</param>
         /// <param name="filePath">Speech audio file path.</param>
         /// <param name="parameters">API request parameters.</param>
         /// <param name="cancellationToken">Operation cancellation token.</param>
         /// <param name="debug">Log debug information.</param>
         /// <returns>Response text that is specified format by request body (Default is JSON).</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="filePath"/> must not be empty.</exception>
-        /// <exception cref="FileNotFoundException"><paramref name="filePath"/> is not found.</exception>
-        /// <exception cref="ArgumentNullException"><paramref name="apiKey"/> must not be empty.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="filePath" /> must not be empty.</exception>
+        /// <exception cref="FileNotFoundException"><paramref name="filePath" /> is not found.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="apiKey" /> must not be empty.</exception>
         /// <exception cref="InvalidDataException">Invalid request parameters.</exception>
         /// <exception cref="UncertainResultPatternMatchException">Library bad implementation.</exception>
         public static async UniTask<IUncertainResult<string>> TranslateFileAsync(

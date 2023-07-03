@@ -7,5 +7,16 @@
   "author": {
     "name": "Mochineko",
     "email": "t.o.e.4315@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com:mochi-neko/Whisper-API-unity.git"
+  },
+  "dependencies": {
+    "com.mochineko.relent": "https://github.com/mochi-neko/Relent.git?path=/Assets/Mochineko/Relent#0.2.0",
+    "com.cysharp.unitask": "https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask",
+    "com.unity.logging": "1.0.11",
+    "com.unity.burst": "1.8.7",
+    "com.unity.nuget.newtonsoft-json": "3.2.1"
   }
 }

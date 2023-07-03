@@ -7,7 +7,6 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using Mochineko.Relent.UncertainResult;
 using Unity.Logging;
-using UnityEngine;
 
 namespace Assets.Mochineko.WhisperAPI
 {
@@ -25,14 +24,14 @@ namespace Assets.Mochineko.WhisperAPI
         /// https://platform.openai.com/docs/api-reference/audio/create
         /// </summary>
         /// <param name="apiKey">OpenAI API key.</param>
-        /// <param name="httpClient"><see cref="HttpClient"/> instance.</param>
+        /// <param name="httpClient"><see cref="HttpClient" /> instance.</param>
         /// <param name="fileStream">Speech audio file stream.</param>
         /// <param name="parameters">API request parameters.</param>
         /// <param name="cancellationToken">Operation cancellation token.</param>
         /// <param name="debug">Log debug information.</param>
         /// <returns>Response text that is specified format by request body (Default is JSON).</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="apiKey"/> must not be null.</exception>
-        /// <exception cref="InvalidOperationException"><paramref name="fileStream"/> must be readable.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="apiKey" /> must not be null.</exception>
+        /// <exception cref="InvalidOperationException"><paramref name="fileStream" /> must be readable.</exception>
         /// <exception cref="InvalidDataException">Invalid request parameters.</exception>
         /// <exception cref="UncertainResultPatternMatchException">Library bad implementation.</exception>
         public static async UniTask<IUncertainResult<string>> TranscribeAsync(
@@ -59,7 +58,7 @@ namespace Assets.Mochineko.WhisperAPI
             if (cancellationToken.IsCancellationRequested)
             {
                 Log.Error("[WhisperAPI.Transcription] Already cancelled.");
-                return UncertainResults.RetryWithTrace<string>($"Already cancelled.");
+                return UncertainResults.RetryWithTrace<string>("Already cancelled.");
             }
 
             // Create request
@@ -75,7 +74,7 @@ namespace Assets.Mochineko.WhisperAPI
 
             // Run request on a thread pool
             await UniTask.SwitchToThreadPool();
-            
+
             // Send request
             HttpResponseMessage responseMessage;
             var apiResult = await UncertainTryFactory
@@ -93,9 +92,9 @@ namespace Assets.Mochineko.WhisperAPI
                     return UniTask.CompletedTask;
                 })
                 .ExecuteAsync(cancellationToken);
-            
+
             await UniTask.SwitchToMainThread();
-            
+
             switch (apiResult)
             {
                 case IUncertainSuccessResult<HttpResponseMessage> apiSuccess:
@@ -129,7 +128,7 @@ namespace Assets.Mochineko.WhisperAPI
             {
                 Log.Error("[WhisperAPI.Transcription] Response content is null.");
                 return UncertainResults.FailWithTrace<string>(
-                    $"Response content is null.");
+                    "Response content is null.");
             }
 
             var responseText = await responseMessage.Content.ReadAsStringAsync();
@@ -137,7 +136,7 @@ namespace Assets.Mochineko.WhisperAPI
             {
                 Log.Error("[WhisperAPI.Transcription] Response body is empty.");
                 return UncertainResults.FailWithTrace<string>(
-                    $"Response body is empty.");
+                    "Response body is empty.");
             }
 
             if (debug)
@@ -161,7 +160,8 @@ namespace Assets.Mochineko.WhisperAPI
                 return UncertainResults.Succeed(responseText);
             }
             // Rate limit exceeded
-            else if (responseMessage.StatusCode is HttpStatusCode.TooManyRequests)
+
+            if (responseMessage.StatusCode is HttpStatusCode.TooManyRequests)
             {
                 Log.Error(
                     "[WhisperAPI.Transcription] Retryable because the API has exceeded rate limit with status code:({0}){1}, error response:\n{2}.",
@@ -171,11 +171,11 @@ namespace Assets.Mochineko.WhisperAPI
                     $"Retryable because the API has exceeded rate limit with status code:({(int)responseMessage.StatusCode}){responseMessage.StatusCode}, error response:\n{responseText}.");
             }
             // Retryable
-            else if ((int)responseMessage.StatusCode is >= 500 and <= 599)
+            if ((int)responseMessage.StatusCode is >= 500 and <= 599)
             {
                 Log.Error(
-                        "[WhisperAPI.Transcription] Retryable because the API returned status code:({0}){1}, error response:\n{2}.",
-                        (int)responseMessage.StatusCode, responseMessage.StatusCode, responseText);
+                    "[WhisperAPI.Transcription] Retryable because the API returned status code:({0}){1}, error response:\n{2}.",
+                    (int)responseMessage.StatusCode, responseMessage.StatusCode, responseText);
 
                 return UncertainResults.RetryWithTrace<string>(
                     $"Retryable because the API returned status code:({(int)responseMessage.StatusCode}){responseMessage.StatusCode}, error response:\n{responseText}.");
@@ -184,8 +184,8 @@ namespace Assets.Mochineko.WhisperAPI
             else
             {
                 Log.Error(
-                        "[WhisperAPI.Transcription] Failed because the API returned status code:({0}){1}, error response:\n{2}.",
-                        (int)responseMessage.StatusCode, responseMessage.StatusCode, responseText);
+                    "[WhisperAPI.Transcription] Failed because the API returned status code:({0}){1}, error response:\n{2}.",
+                    (int)responseMessage.StatusCode, responseMessage.StatusCode, responseText);
 
                 return UncertainResults.FailWithTrace<string>(
                     $"Failed because the API returned status code:({(int)responseMessage.StatusCode}){responseMessage.StatusCode}, error response:\n{responseText}."
@@ -198,15 +198,15 @@ namespace Assets.Mochineko.WhisperAPI
         /// https://platform.openai.com/docs/api-reference/audio/create
         /// </summary>
         /// <param name="apiKey">OpenAI API key.</param>
-        /// <param name="httpClient"><see cref="HttpClient"/> instance.</param>
+        /// <param name="httpClient"><see cref="HttpClient" /> instance.</param>
         /// <param name="filePath">Speech audio file path.</param>
         /// <param name="parameters">API request parameters.</param>
         /// <param name="cancellationToken">Operation cancellation token.</param>
         /// <param name="debug">Log debug information.</param>
         /// <returns>Response text that is specified format by request body (Default is JSON).</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="filePath"/> must not be empty.</exception>
-        /// <exception cref="FileNotFoundException"><paramref name="filePath"/> is not found.</exception>
-        /// <exception cref="ArgumentNullException"><paramref name="apiKey"/> must not be empty.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="filePath" /> must not be empty.</exception>
+        /// <exception cref="FileNotFoundException"><paramref name="filePath" /> is not found.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="apiKey" /> must not be empty.</exception>
         /// <exception cref="InvalidDataException">Invalid request parameters.</exception>
         /// <exception cref="UncertainResultPatternMatchException">Library bad implementation.</exception>
         public static async UniTask<IUncertainResult<string>> TranscribeFileAsync(
@@ -228,7 +228,7 @@ namespace Assets.Mochineko.WhisperAPI
                 Log.Fatal("[WhisperAPI.Transcription] File is not found at {0}", filePath);
                 throw new FileNotFoundException(filePath);
             }
-            
+
             await using var fileStream = File.OpenRead(filePath);
 
             return await TranscribeAsync(

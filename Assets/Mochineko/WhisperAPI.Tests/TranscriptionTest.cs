@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.IO;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Assets.Mochineko.WhisperAPI;
@@ -29,7 +30,7 @@ namespace Mochineko.WhisperAPI.Tests
                 Application.dataPath,
                 "Mochineko/WhisperAPI.Tests/test.wav");
 
-            using var httpClient = new System.Net.Http.HttpClient();
+            using var httpClient = new HttpClient();
 
             var apiResult = await TranscriptionAPI
                 .TranscribeFileAsync(
@@ -37,7 +38,7 @@ namespace Mochineko.WhisperAPI.Tests
                     httpClient,
                     filePath,
                     new TranscriptionRequestParameters(
-                        file: filePath,
+                        filePath,
                         Model.Whisper1,
                         temperature: 0f),
                     CancellationToken.None,

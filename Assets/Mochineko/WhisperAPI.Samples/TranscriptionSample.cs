@@ -17,22 +17,18 @@ namespace Mochineko.WhisperAPI.Samples
     /// </summary>
     public sealed class TranscriptionSample : MonoBehaviour
     {
+        private static readonly HttpClient httpClient = new();
+
         /// <summary>
         /// File path of speech audio.
         /// </summary>
         [SerializeField] private string filePath = string.Empty;
 
-        private static readonly HttpClient httpClient = new();
+        private readonly IPolicy<string> policy = PolicyFactory.Build();
 
         private readonly TranscriptionRequestParameters requestParameters = new(
-            file: string.Empty,
-            Model.Whisper1,
-            prompt: null,
-            responseFormat: null,
-            temperature: null,
-            language: null);
-
-        private readonly IPolicy<string> policy = PolicyFactory.Build();
+            string.Empty,
+            Model.Whisper1);
 
         [ContextMenu(nameof(Transcribe))]
         public void Transcribe()
@@ -44,10 +40,7 @@ namespace Mochineko.WhisperAPI.Samples
         private async UniTask TranscribeAsync(CancellationToken cancellationToken)
         {
             var apiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY");
-            if (string.IsNullOrEmpty(apiKey))
-            {
-                throw new NullReferenceException(nameof(apiKey));
-            }
+            if (string.IsNullOrEmpty(apiKey)) throw new NullReferenceException(nameof(apiKey));
 
             var absoluteFilePath = Path.Combine(
                 Application.dataPath,
@@ -56,7 +49,7 @@ namespace Mochineko.WhisperAPI.Samples
 
             requestParameters.File = filePath;
 
-            Log.Debug("[Whisper_API.Samples] Begin to transcribe.");
+            Log.Debug("[WhisperAPI.Samples] Begin to transcribe.");
 
             // Transcribe speech into text by Whisper transcription API.
             var result = await policy
@@ -68,7 +61,7 @@ namespace Mochineko.WhisperAPI.Samples
                                 absoluteFilePath,
                                 requestParameters,
                                 innerCancellationToken,
-                                debug: true),
+                                true),
                     cancellationToken);
 
             switch (result)
@@ -78,19 +71,19 @@ namespace Mochineko.WhisperAPI.Samples
                 {
                     // Default text response format is JSON.
                     var text = TranscriptionResponseBody.FromJson(success.Result)?.Text;
-                    Log.Debug("[Whisper_API.Samples] Succeeded to transcribe into: {0}.", text);
+                    Log.Debug("[WhisperAPI.Samples] Succeeded to transcribe into: {0}.", text);
                     break;
                 }
                 // Retryable failure
                 case IUncertainRetryableResult<string> retryable:
                 {
-                    Log.Error("[Whisper_API.Samples] Failed to transcribe because -> {0}.", retryable.Message);
+                    Log.Error("[WhisperAPI.Samples] Retryable failed to transcribe because -> {0}.", retryable.Message);
                     break;
                 }
                 // Failure
                 case IUncertainFailureResult<string> failure:
                 {
-                    Log.Error("[Whisper_API.Samples] Failed to transcribe because -> {0}.", failure.Message);
+                    Log.Error("[WhisperAPI.Samples] Failed to transcribe because -> {0}.", failure.Message);
                     break;
                 }
                 default:

@@ -19,12 +19,12 @@ namespace Mochineko.WhisperAPI.Samples
         public static IPolicy<string> Build()
         {
             var totalTimeout = TimeoutFactory.Timeout<string>(
-                timeout: TimeSpan.FromSeconds(TotalTimeoutSeconds));
+                TimeSpan.FromSeconds(TotalTimeoutSeconds));
 
             var retry = RetryFactory.RetryWithExponentialBackoff<string>(
                 MaxRetryCount,
-                factor: ExponentialBackoffFactor,
-                baseNumber: ExponentialBackoffBaseNumber);
+                ExponentialBackoffFactor,
+                ExponentialBackoffBaseNumber);
 
             var bulkheadPolicy = BulkheadFactory.Bulkhead<string>(
                 MaxParallelization);
